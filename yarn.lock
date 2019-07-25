@@ -1331,6 +1331,170 @@
     "@svgr/plugin-svgo" "^4.0.3"
     loader-utils "^1.1.0"
 
+"@thi.ng/api@^6.3.1":
+  version "6.3.1"
+  resolved "https://registry.yarnpkg.com/@thi.ng/api/-/api-6.3.1.tgz#9a9e37b12fc5d7d411b32aba8523d84cdaee84c2"
+  integrity sha512-lMeXl1Ki+BlB+5Ggi4vO1bc1BaODNoW1qUJKLJOlNfTLNarMucPH9005owQfZreOXhm/i1LiWJJaA53X2ajPFQ==
+  dependencies:
+    "@thi.ng/errors" "^1.1.1"
+
+"@thi.ng/arrays@^0.2.1":
+  version "0.2.1"
+  resolved "https://registry.yarnpkg.com/@thi.ng/arrays/-/arrays-0.2.1.tgz#6833e60ffa003e5391547df0cfcb806394a2c7e6"
+  integrity sha512-79YAzqIWXv8YdDHonc8LQzLvxyR5eoTR7zGUERYtAbIofyzyPzN12zROAYwbnWbxuqzP57k+Qz/EmVaEnzkfuQ==
+  dependencies:
+    "@thi.ng/api" "^6.3.1"
+    "@thi.ng/checks" "^2.2.1"
+    "@thi.ng/compare" "^1.0.8"
+    "@thi.ng/equiv" "^1.0.8"
+    "@thi.ng/errors" "^1.1.1"
+    "@thi.ng/random" "^1.1.9"
+
+"@thi.ng/binary@^1.0.8":
+  version "1.0.8"
+  resolved "https://registry.yarnpkg.com/@thi.ng/binary/-/binary-1.0.8.tgz#48fe07aace6a0374f0a954231f372ee6cbc2a6fa"
+  integrity sha512-ytJBndpe3OzQQIvkSNN4sUha2ZmHC+QBk8LVqtLZeR8nknV3fIb8/+7phDaYkfW97EZb4jC0m18rE2effs22aA==
+
+"@thi.ng/checks@^2.2.1":
+  version "2.2.1"
+  resolved "https://registry.yarnpkg.com/@thi.ng/checks/-/checks-2.2.1.tgz#4b00c6768f201446c939694a87e4dd2260022a81"
+  integrity sha512-43R9ZDyNQUdDMJPUVdHa64Tmm1U2T8xbREhaaZ8CfCAlshPmVuFjU5FgwoFpLWbIKsNL/oPp6ydZ/lKDEX2xKg==
+
+"@thi.ng/compare@^1.0.8":
+  version "1.0.8"
+  resolved "https://registry.yarnpkg.com/@thi.ng/compare/-/compare-1.0.8.tgz#67c979bdb17e090f6b80c5493d48107d8d1f1a8c"
+  integrity sha512-/FASrHRTYkidUt+YLMuowMFfVVuLksB7Kjh5N/Yo7z+TkDzQ6rNYQQvJJfS/uxJ2eFqjhoFVV8Dg+bquGGLfqg==
+
+"@thi.ng/compose@^1.3.1":
+  version "1.3.1"
+  resolved "https://registry.yarnpkg.com/@thi.ng/compose/-/compose-1.3.1.tgz#576752e981aaffd9935404549af9b61e6797f783"
+  integrity sha512-OMV4o9WFppZwHyB0mRwhixErt7tDZCadwa1tfI+FJEkPQusMQxRBk/m4jofnEPzgrceCLYR/TQ0KNxAhMxBIzA==
+  dependencies:
+    "@thi.ng/api" "^6.3.1"
+    "@thi.ng/errors" "^1.1.1"
+
+"@thi.ng/equiv@^1.0.8":
+  version "1.0.8"
+  resolved "https://registry.yarnpkg.com/@thi.ng/equiv/-/equiv-1.0.8.tgz#de650e2b9a833db7b620f17472b1c7abb3ed9852"
+  integrity sha512-WSkk4ceiz4p3tOwqbtgg9Y7JKRJ5p/dp4vwVNApQ9E5/7F3ld1bcaDl4K2EPnxcaVngQR17DzgYFiCCNXAioFA==
+
+"@thi.ng/errors@^1.1.1":
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/@thi.ng/errors/-/errors-1.1.1.tgz#6f641735112698add7ab729306d2b62c081d4b80"
+  integrity sha512-OBdKO5kqjtcC1ueIx+VhCkhioikjlHyYJUoNKBvTsqh/A92Q2vK3fykFu6t+GMY++Zfrs5mytqz6nHrusOHtmQ==
+
+"@thi.ng/geom-api@^0.3.0":
+  version "0.3.0"
+  resolved "https://registry.yarnpkg.com/@thi.ng/geom-api/-/geom-api-0.3.0.tgz#c37886af941cf1f001127c6b132e0f789c1cd8a4"
+  integrity sha512-1anda5v+ogbGRs40IuqXClea5Wy6y8s1lpJq3X7lHC+Zcj70KCr1BKgA7ni8HXCsLhnBEDcFUG2GGlpSi5lIfA==
+  dependencies:
+    "@thi.ng/api" "^6.3.1"
+    "@thi.ng/vectors" "^3.0.2"
+
+"@thi.ng/geom-clip@^0.1.2":
+  version "0.1.2"
+  resolved "https://registry.yarnpkg.com/@thi.ng/geom-clip/-/geom-clip-0.1.2.tgz#46bba8b0f7ddaa517e49a871f5fb3a418206fedd"
+  integrity sha512-gZr1NXt7eozrG5gwffmPH/UDe7E5b69rkfVIYQhJbEFbucl51kdgZRATeGtzu3q3tadfKevM55Wo9cJ9BUrPzQ==
+  dependencies:
+    "@thi.ng/geom-isec" "^0.3.2"
+    "@thi.ng/geom-poly-utils" "^0.1.20"
+    "@thi.ng/math" "^1.4.1"
+    "@thi.ng/vectors" "^3.0.2"
+
+"@thi.ng/geom-closest-point@^0.3.2":
+  version "0.3.2"
+  resolved "https://registry.yarnpkg.com/@thi.ng/geom-closest-point/-/geom-closest-point-0.3.2.tgz#6ca4f005e717f6d4554a283fe18aa930e4281f39"
+  integrity sha512-Wpdqe5Bewm6dwNqkCadY9fPg40nXRS0XpzysEm6xBmqiB7zSUnMcyutpYez1um7jCXWcn+Z2xPQCEEdDXCY86Q==
+  dependencies:
+    "@thi.ng/math" "^1.4.1"
+    "@thi.ng/vectors" "^3.0.2"
+
+"@thi.ng/geom-hull@^0.0.22":
+  version "0.0.22"
+  resolved "https://registry.yarnpkg.com/@thi.ng/geom-hull/-/geom-hull-0.0.22.tgz#956231feab6bd2821501a6e8bb72c3f76ce08bad"
+  integrity sha512-MpatZKX2F72lxR+mRuJo1csl0Cz5YPWlUDkPWZIj8/Uggx5N2hKy1NAIPFJKGUtpM69GDoS+L1tLD1JU4vY+SA==
+  dependencies:
+    "@thi.ng/math" "^1.4.1"
+    "@thi.ng/vectors" "^3.0.2"
+
+"@thi.ng/geom-isec@^0.3.2":
+  version "0.3.2"
+  resolved "https://registry.yarnpkg.com/@thi.ng/geom-isec/-/geom-isec-0.3.2.tgz#f20013045dde49db4f7700b81703342c0c1cba8e"
+  integrity sha512-METfm09tCyJA5wjxOluwRQadATro0WBI8f2eOsD6juhfp39QYNTP7O0KxOfsKLsvCCAO3FYQroJMS0IZmrC67A==
+  dependencies:
+    "@thi.ng/api" "^6.3.1"
+    "@thi.ng/geom-api" "^0.3.0"
+    "@thi.ng/geom-closest-point" "^0.3.2"
+    "@thi.ng/math" "^1.4.1"
+    "@thi.ng/vectors" "^3.0.2"
+
+"@thi.ng/geom-poly-utils@^0.1.20":
+  version "0.1.20"
+  resolved "https://registry.yarnpkg.com/@thi.ng/geom-poly-utils/-/geom-poly-utils-0.1.20.tgz#660b9a201be6f0164d24d0434b49d9373479025b"
+  integrity sha512-3x5UVotEk7hMOkQXMZsI+VmAIOaDAEZAcX0HfoQ105EjZFyHp2ULRqXdr0TTl9A0CwQRDCcqMIFdamg0CGBtKA==
+  dependencies:
+    "@thi.ng/errors" "^1.1.1"
+    "@thi.ng/geom-api" "^0.3.0"
+    "@thi.ng/math" "^1.4.1"
+    "@thi.ng/vectors" "^3.0.2"
+
+"@thi.ng/math@^1.4.1":
+  version "1.4.1"
+  resolved "https://registry.yarnpkg.com/@thi.ng/math/-/math-1.4.1.tgz#43f7e626bc7f65e8f6deb83572f40ae9ab92b065"
+  integrity sha512-NdDx/x/0YSUtSGQPQbcr4Y4PwLApSArakNuDmJk6aNKMRJBOPYEZOGn68ULVzudNQ4tuaztPbrqLzrgtLRdeKg==
+
+"@thi.ng/memoize@^1.1.1":
+  version "1.1.1"
+  resolved "https://registry.yarnpkg.com/@thi.ng/memoize/-/memoize-1.1.1.tgz#dca0d0d847d6e00961f42a00a70bb63ccbc2a8f1"
+  integrity sha512-y79KRywY127sUFY6HVbjwPrakWwhefREmSlcGCNsdlwK3+dMkKjyrNbLCEl9LOXPxysO4mmUeqyGJpcelO+A5w==
+  dependencies:
+    "@thi.ng/api" "^6.3.1"
+
+"@thi.ng/random@^1.1.9":
+  version "1.1.9"
+  resolved "https://registry.yarnpkg.com/@thi.ng/random/-/random-1.1.9.tgz#5e4205c7d1972a613319a65300febef1f4bfff4a"
+  integrity sha512-5qLXozfL+ZpFFwmwiIw2jRna9GOHtr/xP2GDlWWPvdatdAsYBkgJZUrVkmra0oLfmgLYZ3n0dNQK0pSbCmwziw==
+  dependencies:
+    "@thi.ng/api" "^6.3.1"
+
+"@thi.ng/strings@^1.2.1":
+  version "1.2.1"
+  resolved "https://registry.yarnpkg.com/@thi.ng/strings/-/strings-1.2.1.tgz#c73444812cc8ae407702dcf70d1af92a99b5aab1"
+  integrity sha512-uVvctBJ0mQI1okW19prKoXIf+72gaKVXhCOW+Fc+yYSvsQYmZAHlsrKArtjhIy+QCr24hLnite4W+zD25tkEjQ==
+  dependencies:
+    "@thi.ng/errors" "^1.1.1"
+    "@thi.ng/memoize" "^1.1.1"
+
+"@thi.ng/transducers@^5.4.1":
+  version "5.4.1"
+  resolved "https://registry.yarnpkg.com/@thi.ng/transducers/-/transducers-5.4.1.tgz#01f1ea365431163aa82fdc90ad5aa47607c8ecc4"
+  integrity sha512-hIym7yqxrj4n87dznK79fx/iSlJc1vms7/3Z32P3BOQpOVpNo2Zx8wXz7n/hfU/KxROLN1RaNjZ2hMz5Kh37+A==
+  dependencies:
+    "@thi.ng/api" "^6.3.1"
+    "@thi.ng/arrays" "^0.2.1"
+    "@thi.ng/checks" "^2.2.1"
+    "@thi.ng/compare" "^1.0.8"
+    "@thi.ng/compose" "^1.3.1"
+    "@thi.ng/equiv" "^1.0.8"
+    "@thi.ng/errors" "^1.1.1"
+    "@thi.ng/random" "^1.1.9"
+    "@thi.ng/strings" "^1.2.1"
+
+"@thi.ng/vectors@^3.0.2":
+  version "3.0.2"
+  resolved "https://registry.yarnpkg.com/@thi.ng/vectors/-/vectors-3.0.2.tgz#b718715b5134ed9d43d05e5e74dbb5ccee66ef17"
+  integrity sha512-Y6VR+TInK3yOhZjYeqL5/wxRccL7wfPQnFsBwfCxFTxay2z4NmaTfGV9zXvXC3ewDbIhVgw7CCs5XSBdc5kv8w==
+  dependencies:
+    "@thi.ng/api" "^6.3.1"
+    "@thi.ng/binary" "^1.0.8"
+    "@thi.ng/checks" "^2.2.1"
+    "@thi.ng/equiv" "^1.0.8"
+    "@thi.ng/errors" "^1.1.1"
+    "@thi.ng/math" "^1.4.1"
+    "@thi.ng/memoize" "^1.1.1"
+    "@thi.ng/random" "^1.1.9"
+    "@thi.ng/transducers" "^5.4.1"
+
 "@types/babel__core@^7.1.0":
   version "7.1.2"
   resolved "https://registry.yarnpkg.com/@types/babel__core/-/babel__core-7.1.2.tgz#608c74f55928033fce18b99b213c16be4b3d114f"
@@ -6072,6 +6236,11 @@ lodash.memoize@^4.1.2:
   resolved "https://registry.yarnpkg.com/lodash.memoize/-/lodash.memoize-4.1.2.tgz#bcc6c49a42a2840ed997f323eada5ecd182e0bfe"
   integrity sha1-vMbEmkKihA7Zl/Mj6tpezRguC/4=
 
+lodash.product@^18.9.19:
+  version "18.9.19"
+  resolved "https://registry.yarnpkg.com/lodash.product/-/lodash.product-18.9.19.tgz#c1f49a4b447869290a8799c29295703fda294835"
+  integrity sha512-yPX6KO0jveBR/DjSngqvUEynWTb4oJwB8g5WseShPzX0CO8pjX1gxlR5Fo7V3E81uPDc9mEuNVw3Ah6df9uy0g==
+
 lodash.sortby@^4.7.0:
   version "4.7.0"
   resolved "https://registry.yarnpkg.com/lodash.sortby/-/lodash.sortby-4.7.0.tgz#edd14c824e2cc9c1e0b0a1b42bb5210516a42438"
@@ -8144,7 +8313,7 @@ react-dev-utils@^9.0.1:
     strip-ansi "5.2.0"
     text-table "0.2.0"
 
-react-dom@16.8.6:
+react-dom@^16.8.6:
   version "16.8.6"
   resolved "https://registry.yarnpkg.com/react-dom/-/react-dom-16.8.6.tgz#71d6303f631e8b0097f56165ef608f051ff6e10f"
   integrity sha512-1nL7PIq9LTL3fthPqwkvr2zY7phIPjYrT0jp4HjyEQrEROnw4dG41VVwi/wfoCneoleqrNX7iAD+pXebJZwrwA==
@@ -8224,7 +8393,7 @@ react-scripts@3.0.1:
   optionalDependencies:
     fsevents "2.0.6"
 
-react@16.8.6:
+react@^16.8.6:
   version "16.8.6"
   resolved "https://registry.yarnpkg.com/react/-/react-16.8.6.tgz#ad6c3a9614fd3a4e9ef51117f54d888da01f2bbe"
   integrity sha512-pC0uMkhLaHm11ZSJULfOBqV4tIZkx87ZLvbbQYunNixAAvjnC+snJCg0XQXn9VIsttVsbZP/H/ewzgsd5fxKXw==

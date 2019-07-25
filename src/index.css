@@ -5,9 +5,20 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+    font-size: 24px;
+    color: #ccc;
 }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
-    monospace;
+pre {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New", monospace;
+  color: #ccc;
+}
+
+
+.fretboard {
+    width: 800px;
+}
+
+canvas {
+    width: 100%;
 }
