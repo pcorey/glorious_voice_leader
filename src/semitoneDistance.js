@@ -3,7 +3,7 @@ import _ from "lodash";
 
 const note = (string, fret) => {
   let tuning = [40, 45, 50, 55, 59, 64];
-  return (tuning[5 - string] + fret) % 12;
+  return tuning[5 - string] + fret;
 };
 
 const chunk = (list, n) => {

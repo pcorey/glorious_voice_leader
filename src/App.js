@@ -59,47 +59,40 @@ const Fretboard = ({ chord, previousChord, onClickFret = () => {} }) => {
     };
   };
 
-  let h = heatmap(
-    _.chain(chord.voicings)
-      .thru(
-        voicings =>
-          previousChord
-            ? _.chain(voicings)
-                // .sortBy(polygonDistance(previousChord, fretPosition))
-                .thru(voicings => {
-                  let semitoneDistancer = semitoneDistance(previousChord);
-                  let polygonDistancer = polygonDistance(
-                    previousChord,
-                    fretPosition
-                  );
-                  console.log(_.groupBy(voicings, semitoneDistancer));
-                  return voicings.sort((a, b) => {
-                    let distanceA = semitoneDistancer(a);
-                    let distanceB = semitoneDistancer(b);
-                    if (distanceA == distanceB) {
-                      return polygonDistancer(a) - polygonDistancer(b);
-                    } else {
-                      return distanceB - distanceA;
-                    }
-                  });
-                })
-                // .sortBy(semitoneDistance(previousChord))
-                // .sortBy(polygonDistance(previousChord, fretPosition))
-                .value()
-            : voicings
-      )
-      .filter(voicing => {
-        return _.every(notesInChord, note =>
-          _.chain(voicing)
-            .map(note => note.toString())
-            .includes(note.toString())
-            .value()
-        );
+  let relevantVoicings = _.filter(chord.voicings, voicing => {
+    return _.every(notesInChord, note =>
+      _.chain(voicing)
+        .map(note => note.toString())
+        .includes(note.toString())
+        .value()
+    );
+  });
+
+  let h = _.chain(chord.voicings)
+    .thru(voicings =>
+      heatmap(voicings, ({ i, voicing }) => {
+        let hasPreviousChord = !_.isEmpty(_.get(previousChord, "notes"));
+        if (hasPreviousChord) {
+          let distance = semitoneDistance(previousChord)(voicing) || 0.1;
+          return 1 / distance;
+        } else {
+          return 1;
+        }
       })
-      .thru(voicings => (_.size(voicings) == 1 ? [] : voicings))
-      .value(),
-    !_.isEmpty(_.get(previousChord, "notes"))
-  );
+    )
+    .mapValues((value, key) => {
+      let [string, fret] = JSON.parse(`[${key}]`);
+      let inVoicing = _.chain(relevantVoicings)
+        .some(voicing =>
+          _.chain(voicing)
+            .map(voicing => voicing.toString())
+            .includes([string, fret].toString())
+            .value()
+        )
+        .value();
+      return inVoicing ? (_.size(relevantVoicings) > 1 ? value : 0) : 0;
+    })
+    .value();
 
   const fretWidth = () => {
     let canvas = ref.current;
@@ -242,76 +235,6 @@ const Fretboard = ({ chord, previousChord, onClickFret = () => {} }) => {
       context.rect(x - offset, y - offset, offset * 2, offset * 2);
       context.stroke();
     };
-
-    // // Draw convex hull
-    // let sortedNotes = grahamScan2(
-    //   _.chain(chord.notes)
-    //     .map(([string, fret]) => {
-    //       let { x, y } = fretPosition(5 - string, fret);
-    //       return [x, y];
-    //     })
-    //     .value()
-    // );
-    // let [firstString, firstFret] = _.first(sortedNotes) || [0, 0];
-    // context.fillStyle = "rgba(255,0,0,0.25)";
-    // context.beginPath();
-    // context.moveTo(firstString, firstFret);
-    // _.map(sortedNotes, ([x, y]) => {
-    //   context.lineTo(x, y);
-    // });
-    // context.fill();
-
-    // // Draw previous convex hull
-    // if (previousChord) {
-    //   let sortedPreviousNotes = grahamScan2(
-    //     _.chain(previousChord.notes)
-    //       .map(([string, fret]) => {
-    //         let { x, y } = fretPosition(5 - string, fret);
-    //         return [x, y];
-    //       })
-    //       .value()
-    //   );
-    //   let [fx, fy] = _.first(sortedPreviousNotes) || [0, 0];
-    //   context.fillStyle = "rgba(255,128,0,0.25)";
-    //   context.beginPath();
-    //   context.moveTo(fx, fy);
-    //   _.map(sortedPreviousNotes, ([x, y]) => {
-    //     context.lineTo(x, y);
-    //   });
-    //   context.fill();
-    // }
-
-    // // Draw intersection
-    // if (previousChord) {
-    //   let sortedNotes = grahamScan2(
-    //     _.chain(chord.notes)
-    //       .map(([string, fret]) => {
-    //         let { x, y } = fretPosition(5 - string, fret);
-    //         return [x, y];
-    //       })
-    //       .value()
-    //   );
-    //   let sortedPreviousNotes = grahamScan2(
-    //     _.chain(previousChord.notes)
-    //       .map(([string, fret]) => {
-    //         let { x, y } = fretPosition(5 - string, fret);
-    //         return [x, y];
-    //       })
-    //       .value()
-    //   );
-    //   if (!_.isEmpty(sortedNotes) && !_.isEmpty(sortedPreviousNotes)) {
-    //     let points = sutherlandHodgeman(sortedNotes, sortedPreviousNotes);
-    //     let [fx, fy] = _.first(points) || [0, 0];
-    //     context.strokeStyle = "tomato";
-    //     context.beginPath();
-    //     context.moveTo(fx, fy);
-    //     _.map(points, ([x, y]) => {
-    //       context.lineTo(x, y);
-    //     });
-    //     context.lineTo(fx, fy);
-    //     context.stroke();
-    //   }
-    // }
 
     // Draw notes
     _.chain(chord)
