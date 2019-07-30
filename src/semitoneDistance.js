@@ -30,7 +30,7 @@ export default previousChord => {
   let previousNotes = _.chain(previousChord.notes)
     .map(([string, fret]) => {
       if (!previousChord.labels[[string, fret]]) {
-        return note(string, fret);
+        return note(5 - string, fret);
       }
     })
     .reject(_.isUndefined)
@@ -43,15 +43,20 @@ export default previousChord => {
     }
 
     let notes = _.chain(voicing)
-      .map(([string, fret]) => note(string, fret))
+      .map(([string, fret]) => note(5 - string, fret))
       .sort()
       .value();
 
-    return _.chain(notes)
-      .thru(voicing => chunk(notes, _.size(previousNotes)))
+    let [bigger, smaller] =
+      _.size(notes) >= _.size(previousNotes)
+        ? [notes, previousNotes]
+        : [previousNotes, notes];
+
+    return _.chain(bigger)
+      .thru(bigger => chunk(bigger, _.size(smaller)))
       .map(chunk =>
         _.chain(chunk)
-          .zip(previousNotes)
+          .zip(smaller)
           .map(([a, b]) => Math.abs(a - b))
           .sum()
           .value()

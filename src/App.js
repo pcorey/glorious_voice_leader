@@ -68,15 +68,17 @@ const Fretboard = ({ chord, previousChord, onClickFret = () => {} }) => {
     );
   });
 
+  const f = x => x * 2 / (x * 2 + 1);
+
   let h = _.chain(chord.voicings)
     .thru(voicings =>
-      heatmap(voicings, ({ i, voicing }) => {
+      heatmap(voicings, (previous, { i, voicing }) => {
         let hasPreviousChord = !_.isEmpty(_.get(previousChord, "notes"));
         if (hasPreviousChord) {
           let distance = semitoneDistance(previousChord)(voicing) || 0.1;
-          return 1 / distance;
+          return _.max([previous || 0, 1 / distance]);
         } else {
-          return 1;
+          return (previous || 0) + 1;
         }
       })
     )
@@ -90,7 +92,15 @@ const Fretboard = ({ chord, previousChord, onClickFret = () => {} }) => {
             .value()
         )
         .value();
-      return inVoicing ? (_.size(relevantVoicings) > 1 ? value : 0) : 0;
+      return inVoicing
+        ? _.size(relevantVoicings) > 1 ||
+          _.size(notesInChord) <
+            _.chain(relevantVoicings)
+              .first()
+              .size()
+          ? value
+          : 0
+        : 0;
     })
     .value();
 
@@ -171,7 +181,9 @@ const Fretboard = ({ chord, previousChord, onClickFret = () => {} }) => {
         let [string, fret] = JSON.parse(`[${key}]`);
         string = 5 - string;
         let { x, y } = fretPosition(string, fret);
-        context.fillStyle = `rgba(0,100,255,${value})`;
+        // context.fillStyle = `rgba(255,170,0,${value})`;
+        // context.fillStyle = `rgba(80,0,255,${value})`;
+        context.fillStyle = `rgba(0,0,255,${value})`;
         context.beginPath();
         context.rect(
           x - fretWidth() / 2,
@@ -310,7 +322,7 @@ function App() {
     <div>
       <div
         style={{
-          width: "fit-content",
+          width: "800px",
           margin: "2em auto"
         }}
       >
@@ -332,6 +344,14 @@ function App() {
             }
           ]}
         />
+        {
+          // 	  <p style={{}}>
+          //   <strong>Help! I don't like your recommendations!</strong> - Yes,
+          //   hello. Glorious Voice Leader can only give you suggestions based on
+          //   "musical closeness". Glorious Voice Leader is no replacement for your
+          //   own <span style={{ whiteSpace: "nowrap" }}>ａｅｓｔｈｅｔｉｃ</span>.
+          // </p>
+        }
       </div>
     </div>
   );

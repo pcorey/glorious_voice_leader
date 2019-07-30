@@ -5,8 +5,9 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-    font-size: 24px;
-    color: #ccc;
+    font-size: 16px;
+    line-height: 1.6;
+    color: #333;
 }
 
 pre {
@@ -21,4 +22,13 @@ pre {
 
 canvas {
     width: 100%;
+}
+
+p {
+    color: #666;
+    margin: 2em 0;
+}
+
+p strong {
+    color: #333;
 }
