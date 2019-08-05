@@ -213,6 +213,27 @@ const Fretboard = ({ chord, previousChord, onClickFret = () => {} }) => {
     context.font = "bold 18px sans-serif";
     context.fillText(chord.name, fretWidth(), 0);
 
+    // // Draw chord tones
+    // _.chain(chord.voicings)
+    //   .flatten()
+    //   .uniq()
+    //   .map(([string, fret]) => {
+    //     let { x, y } = fretPosition(5 - string, fret);
+    //     let offset = fretHeight() / 2 * 0.75;
+    //     context.fillStyle = "rgba(255,255,255,1)";
+    //     context.beginPath();
+    //     context.arc(x, y, offset, 0, 2 * Math.PI, true);
+    //     context.fill();
+    //     context.strokeStyle = "#fff";
+    //     context.fillStyle = "#ccc";
+    //     context.textAlign = "center";
+    //     context.textBaseline = "middle";
+    //     context.font = "bold 18px sans-serif";
+    //     context.strokeText(noteName(5 - string, fret), x, y);
+    //     context.fillText(noteName(5 - string, fret), x, y);
+    //   })
+    //   .value();
+
     // Draw heatmap
     _.chain(h)
       .map((value, key) => {
