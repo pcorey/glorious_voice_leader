@@ -168,6 +168,44 @@ const Fretboard = ({ chord, previousChord, onClickFret = () => {} }) => {
       })
       .value();
 
+    // Draw fret markers
+    context.fillStyle = "#eee";
+    _.chain([3, 5, 7, 9, 12, 15])
+      .map(fret => {
+        let double = fret === 12;
+        let { x, y } = fretPosition(2, fret - 1);
+        context.beginPath();
+        if (!double) {
+          context.arc(
+            x + fretWidth() / 2,
+            y + fretHeight() / 2,
+            8,
+            0,
+            2 * Math.PI,
+            true
+          );
+        } else {
+          context.arc(
+            x + fretWidth() / 2,
+            y + fretHeight() / 2 - 10,
+            8,
+            0,
+            2 * Math.PI,
+            true
+          );
+          context.arc(
+            x + fretWidth() / 2,
+            y + fretHeight() / 2 + 10,
+            8,
+            0,
+            2 * Math.PI,
+            true
+          );
+        }
+        context.fill();
+      })
+      .value();
+
     // Draw quality
     context.fillStyle = "#ccc";
     context.textAlign = "left";
