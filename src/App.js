@@ -638,7 +638,7 @@ function App() {
                 style={{
                   backgroundColor: sharps
                     ? "rgb(248, 248, 248)"
-                    : "rgb(211, 214, 255)"
+                    : "rgb(208, 224, 241)"
                 }}
                 onClick={() => setSharps(false)}
               >
@@ -647,7 +647,7 @@ function App() {
               <Button
                 style={{
                   backgroundColor: sharps
-                    ? "rgb(211, 214, 255)"
+                    ? "rgb(208, 224, 241)"
                     : "rgb(248, 248, 248)"
                 }}
                 onClick={() => setSharps(true)}
@@ -698,6 +698,11 @@ function App() {
             pick up Ted Greene's{" "}
             <a href="https://amzn.to/2YQ8xYM">Chord Chemistry</a> and{" "}
             <a href="https://amzn.to/2YWgKur">Modern Chord Progressions</a>.
+          </p>
+          <p>
+            <em>
+              Made by <a href="https://twitter.com/petecorey">@petecorey</a>!
+            </em>
           </p>
           {/*<p style={{}}>
             <strong>I still don't get it.</strong> - Check out a few tunes for
