@@ -5,7 +5,7 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-    font-size: 16px;
+    font-size: 14px!important;
     line-height: 1.6;
     color: #333;
 }
@@ -17,11 +17,12 @@ pre {
 
 
 .fretboard {
-    width: 800px;
+    width: 1000px;
 }
 
 canvas {
-    width: 100%;
+    width: 1000px;
+    height: 200px;
 }
 
 p {
@@ -31,4 +32,12 @@ p {
 
 p strong {
     color: #333;
+}
+
+.ui.selection.dropdown {
+    border: none !important;
+    box-shadow: none !important;
+    background-color: #f8f8f8 !important;
+    vertical-align: middle;
+    margin: 0 1em 0 0;
 }
