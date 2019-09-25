@@ -9,12 +9,27 @@ import voicings from "./voicings";
 import { Button } from "semantic-ui-react";
 import { Checkbox } from "semantic-ui-react";
 import { Dropdown } from "semantic-ui-react";
+import { Select } from "semantic-ui-react";
 import { Icon } from "semantic-ui-react";
 import { grahamScan2 } from "@thi.ng/geom-hull";
 import { sutherlandHodgeman } from "@thi.ng/geom-clip";
 import { useEffect } from "react";
 import { useRef } from "react";
 import { useState } from "react";
+
+const tunings = _.chain([
+  {
+    text: "Standard - EADGBE",
+    value: JSON.stringify([40, 45, 50, 55, 59, 64])
+  },
+  { text: "Drop D - DADGBE", value: JSON.stringify([38, 45, 50, 55, 59, 64]) },
+  { text: "DADGAD", value: JSON.stringify([38, 45, 50, 55, 60, 62]) },
+  { text: "Ukulele (High G) - GBCD", value: JSON.stringify([67, 60, 64, 69]) },
+  { text: "Ukulele (Low G) - GBCD", value: JSON.stringify([55, 60, 64, 69]) }
+])
+  .sortBy("text")
+  .map(option => ({ key: JSON.stringify(option), ...option }))
+  .value();
 
 const qualities = _.chain([
   { text: "7", value: JSON.stringify([0, 4, 7, 10]) },
@@ -55,16 +70,15 @@ function getPixelRatio(context) {
   return (window.devicePixelRatio || 1) / backingStore;
 }
 
-const note = (string, fret) => {
-  let tuning = [40, 45, 50, 55, 59, 64];
-  return (tuning[5 - string] + fret) % 12;
+const note = (string, fret, tuning) => {
+  return (tuning[_.size(tuning) - 1 - string] + fret) % 12;
 };
 
-const noteName = (string, fret, sharps) => {
+const noteName = (string, fret, sharps, tuning) => {
   return (sharps
     ? ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"]
     : ["C", "Db", "D", "Eb", "E", "F", "Gb", "G", "Ab", "A", "Bb", "B"])[
-    note(string, fret)
+    note(string, fret, tuning)
   ];
 };
 
@@ -77,7 +91,8 @@ const Fretboard = React.memo(
     onClickAdd = () => {},
     onClickRemove = () => {},
     previousChord,
-    sharps
+    sharps,
+    tuning
   }) => {
     let ref = useRef();
 
@@ -87,7 +102,7 @@ const Fretboard = React.memo(
         return _.chain(chord.qualities)
           .map(quality => _.map(quality, base => (base + chord.root) % 12))
           .flatten()
-          .includes(note(5 - string, fret))
+          .includes(note(_.size(tuning) - 1 - string, fret, tuning))
           .value();
       })
       .value();
@@ -190,7 +205,7 @@ const Fretboard = React.memo(
       context.strokeStyle = "#eee";
 
       // Draw strings
-      _.chain(6)
+      _.chain(_.size(tuning))
         .range()
         .map(string => {
           let { x: fromX, y: fromY } = fretPosition(string, 0);
@@ -207,7 +222,7 @@ const Fretboard = React.memo(
         .range()
         .map(fret => {
           let { x: fromX, y: fromY } = fretPosition(0, fret);
-          let { x: toX, y: toY } = fretPosition(5, fret);
+          let { x: toX, y: toY } = fretPosition(_.size(tuning) - 1, fret);
           context.beginPath();
           context.moveTo(fromX, fromY);
           context.lineTo(toX, toY);
@@ -220,7 +235,10 @@ const Fretboard = React.memo(
       _.chain([3, 5, 7, 9, 12, 15])
         .map(fret => {
           let double = fret === 12;
-          let { x, y } = fretPosition(2, fret - 1);
+          let { x, y } = fretPosition(
+            Math.floor((_.size(tuning) - 1) / 2),
+            fret - 1
+          );
           context.beginPath();
           if (!double) {
             context.arc(
@@ -265,7 +283,7 @@ const Fretboard = React.memo(
       //   .flatten()
       //   .uniq()
       //   .map(([string, fret]) => {
-      //     let { x, y } = fretPosition(5 - string, fret);
+      //     let { x, y } = fretPosition((_.size(tuning) - 1) - string, fret);
       //     let offset = fretHeight() / 2 * 0.75;
       //     context.fillStyle = "rgba(255,255,255,1)";
       //     context.beginPath();
@@ -276,8 +294,8 @@ const Fretboard = React.memo(
       //     context.textAlign = "center";
       //     context.textBaseline = "middle";
       //     context.font = "bold 18px sans-serif";
-      //     context.strokeText(noteName(5 - string, fret, sharps), x, y);
-      //     context.fillText(noteName(5 - string, fret, sharps), x, y);
+      //     context.strokeText(noteName((_.size(tuning) - 1) - string, fret, sharps, tuning), x, y);
+      //     context.fillText(noteName((_.size(tuning) - 1) - string, fret, sharps, tuning), x, y);
       //   })
       //   .value();
 
@@ -285,7 +303,7 @@ const Fretboard = React.memo(
       _.chain(h)
         .map((value, key) => {
           let [string, fret] = JSON.parse(`[${key}]`);
-          string = 5 - string;
+          string = _.size(tuning) - 1 - string;
           let { x, y } = fretPosition(string, fret);
           // context.fillStyle = `rgba(255,170,0,${value})`;
           // context.fillStyle = `rgba(80,0,255,${value})`;
@@ -301,16 +319,6 @@ const Fretboard = React.memo(
         })
         .value();
 
-      const note = (string, fret) => {
-        let tuning = [40, 45, 50, 55, 59, 64];
-        let note = (tuning[5 - string] + fret) % 12;
-        return (sharps
-          ? ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"]
-          : ["C", "Db", "D", "Eb", "E", "F", "Gb", "G", "Ab", "A", "Bb", "B"])[
-          note
-        ];
-      };
-
       const drawSolid = (string, fret) => {
         let { x, y } = fretPosition(string, fret);
         let offset = fretHeight() / 2 * 0.75;
@@ -322,7 +330,7 @@ const Fretboard = React.memo(
         context.textAlign = "center";
         context.textBaseline = "middle";
         context.font = "bold 18px sans-serif";
-        context.fillText(noteName(string, fret, sharps), x, y);
+        context.fillText(noteName(string, fret, sharps, tuning), x, y);
       };
 
       const drawHollow = (string, fret) => {
@@ -375,8 +383,8 @@ const Fretboard = React.memo(
       _.chain(chord)
         .get("notes")
         .map(([string, fret]) => {
-          string = 5 - string;
-          switch (chord.labels[[5 - string, fret]]) {
+          string = _.size(tuning) - 1 - string;
+          switch (chord.labels[[_.size(tuning) - 1 - string, fret]]) {
             case 1:
               drawHollow(string, fret);
               break;
@@ -404,8 +412,9 @@ const Fretboard = React.memo(
       let x = e.nativeEvent.offsetX * ratio;
       let y = e.nativeEvent.offsetY * ratio;
       let fret = Math.floor((x - fretWidth() / 2) / fretWidth());
-      let string = 5 - Math.floor((y - fretHeight() / 2) / fretHeight());
-      if (fret >= 0 && fret < 18 && string >= 0 && string < 6) {
+      let string =
+        _.size(tuning) - 1 - Math.floor((y - fretHeight() / 2) / fretHeight());
+      if (fret >= 0 && fret < 18 && string >= 0 && string < _.size(tuning)) {
         onClickFret({ string, fret }, e);
       }
     };
@@ -492,26 +501,14 @@ const Fretboard = React.memo(
   _.isEqual
 );
 
-const Fretboards = ({ chords: initialChords, sharps }) => {
-  let [chords, setChords] = useState(initialChords);
-
-  const setAndCacheChords = chords => {
-    let state = _.chain(chords)
-      .map(chord => _.omit(chord, ["voicings"]))
-      .thru(JSON.stringify)
-      .thru(chords => pako.deflate(chords, { to: "string" }))
-      .thru(btoa)
-      .value();
-    window.history.pushState(null, null, `#${state}`);
-    return setChords(chords);
-  };
-
+const Fretboards = ({ chords, setAndCacheChords, sharps, tuning }) => {
   return (
     <div>
       {_.map(chords, (chord, i) => {
         return (
           <div key={chord.key} style={{ margin: "4em 0" }}>
             <Fretboard
+              tuning={tuning}
               sharps={sharps}
               chord={chord}
               previousChord={i == 0 ? undefined : chords[i - 1]}
@@ -547,7 +544,7 @@ const Fretboards = ({ chords: initialChords, sharps }) => {
                   .map(quality =>
                     _.map(quality, base => (base + chord.root) % 12)
                   )
-                  .map(quality => voicings(quality))
+                  .map(quality => voicings(quality, tuning))
                   .flatten()
                   .uniqWith(_.isEqual)
                   .value();
@@ -563,7 +560,7 @@ const Fretboards = ({ chords: initialChords, sharps }) => {
                   .map(quality =>
                     _.map(quality, base => (base + chord.root) % 12)
                   )
-                  .map(quality => voicings(quality))
+                  .map(quality => voicings(quality, tuning))
                   .flatten()
                   .uniqWith(_.isEqual)
                   .value();
@@ -599,30 +596,96 @@ const Fretboards = ({ chords: initialChords, sharps }) => {
   );
 };
 
+const parse = hash => {
+  let initial = {
+    sharps: false,
+    tuning: [40, 45, 50, 55, 59, 64],
+    chords: [
+      {
+        key: Math.random(),
+        root: undefined,
+        qualities: [],
+        voicings: [],
+        notes: [],
+        labels: {}
+      }
+    ]
+  };
+  try {
+    let parsed = !_.isEmpty(hash)
+      ? JSON.parse(pako.inflate(atob(hash), { to: "string" }))
+      : initial;
+    if (_.isArray(parsed)) {
+      return _.extend(initial, { chords: parsed });
+    }
+    return parsed;
+  } catch (error) {
+    console.error("Error parsing hash.", error);
+    return initial;
+  }
+};
+
 function App() {
-  let [sharps, setSharps] = useState(false);
   let urlParams = new URLSearchParams(window.location.search);
   let hash = window.location.hash.slice(1);
-  let chords = hash
-    ? JSON.parse(pako.inflate(atob(hash), { to: "string" }))
-    : [
-        {
-          key: Math.random(),
-          root: undefined,
-          qualities: [],
-          voicings: [],
-          notes: [],
-          labels: {}
-        }
-      ];
+  let {
+    sharps: initialSharps,
+    tuning: initialTuning,
+    chords: initialChords
+  } = parse(hash);
+
+  let [sharps, setSharps] = useState(initialSharps);
+  let [tuning, setTuning] = useState(initialTuning);
+  let [chords, setChords] = useState(initialChords);
+
   _.map(chords, chord => {
     chord.voicings = _.chain(chord.qualities)
       .map(quality => _.map(quality, base => (base + chord.root) % 12))
-      .map(quality => voicings(quality))
+      .map(quality => voicings(quality, tuning))
       .flatten()
       .uniqWith(_.isEqual)
       .value();
   });
+
+  const cache = data => {
+    data = _.cloneDeep(data);
+    _.chain(data.chords)
+      .map(chord => _.omit(chord, ["voicings"]))
+      .value();
+    let state = _.chain(data)
+      .thru(JSON.stringify)
+      .thru(data => pako.deflate(data, { to: "string" }))
+      .thru(btoa)
+      .value();
+    window.history.pushState(null, null, `#${state}`);
+  };
+
+  const setAndCacheChords = chords => {
+    setChords(chords);
+    cache({ sharps, tuning, chords });
+  };
+
+  const onChangeTuning = (event, { value: tuning }) => {
+    let chords = [
+      {
+        key: Math.random(),
+        root: undefined,
+        qualities: [],
+        voicings: [],
+        notes: [],
+        labels: {}
+      }
+    ];
+    setTuning(JSON.parse(tuning));
+    setChords(chords);
+    cache({ sharps, tuning, chords });
+  };
+
+  const onChangeSharps = sharps => {
+    setSharps(sharps);
+    cache({ sharps, tuning, chords });
+  };
+
   return (
     <div>
       <div
@@ -633,6 +696,12 @@ function App() {
       >
         <div style={{ margin: "0 2em 0 2em" }}>
           <div style={{ float: "right" }}>
+            <Select
+              placeholder="Tuning"
+              options={tunings}
+              defaultValue={JSON.stringify(tuning)}
+              onChange={onChangeTuning}
+            />
             <Button.Group>
               <Button
                 style={{
@@ -640,7 +709,7 @@ function App() {
                     ? "rgb(248, 248, 248)"
                     : "rgb(208, 224, 241)"
                 }}
-                onClick={() => setSharps(false)}
+                onClick={() => onChangeSharps(false)}
               >
                 ♭
               </Button>
@@ -650,12 +719,13 @@ function App() {
                     ? "rgb(208, 224, 241)"
                     : "rgb(248, 248, 248)"
                 }}
-                onClick={() => setSharps(true)}
+                onClick={() => onChangeSharps(true)}
               >
                 ♯
               </Button>
             </Button.Group>
           </div>
+
           <p style={{ fontSize: "1em", textTransform: "uppercase" }}>
             <strong>
               {urlParams.has("title")
@@ -665,7 +735,12 @@ function App() {
           </p>
         </div>
 
-        <Fretboards chords={chords} sharps={sharps} />
+        <Fretboards
+          chords={chords}
+          sharps={sharps}
+          tuning={tuning}
+          setAndCacheChords={setAndCacheChords}
+        />
         <div style={{ margin: "-2em 2em 0" }}>
           <p style={{}}>
             <strong>What is this thing?</strong> - Glorious Voice Leader helps

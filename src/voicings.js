@@ -44,14 +44,14 @@ const flatten_chord = strings => chord =>
 
 export default (
   notes,
+  tuning,
   options = {
     frets: 18,
-    max_reach: 5,
-    strings: 6,
-    tuning: [40, 45, 50, 55, 59, 64]
+    max_reach: 5
   }
 ) => {
-  let { frets, max_reach, strings, tuning } = options;
+  let { frets, max_reach } = options;
+  let strings = _.size(tuning);
 
   return (
     _.chain(notes)
