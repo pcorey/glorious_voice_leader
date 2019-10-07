@@ -694,8 +694,29 @@ function App() {
           margin: "2em auto"
         }}
       >
-        <div style={{ margin: "0 2em 0 2em" }}>
-          <div style={{ float: "right" }}>
+        <div
+          style={{
+            margin: "0 2em 0 2em",
+            display: "flex",
+            alignItems: "flex-end"
+          }}
+        >
+          <p
+            style={{
+              flex: "1",
+              fontSize: "2em",
+              textTransform: "uppercase",
+              margin: "0"
+            }}
+          >
+            <strong style={{ fontWeight: "100" }}>
+              {urlParams.has("title")
+                ? urlParams.get("title")
+                : "Glorious Voice Leader"}
+            </strong>
+          </p>
+
+          <div style={{}}>
             <Select
               placeholder="Tuning"
               options={tunings}
@@ -725,14 +746,6 @@ function App() {
               </Button>
             </Button.Group>
           </div>
-
-          <p style={{ fontSize: "1em", textTransform: "uppercase" }}>
-            <strong>
-              {urlParams.has("title")
-                ? urlParams.get("title")
-                : "Glorious Voice Leader!"}
-            </strong>
-          </p>
         </div>
 
         <Fretboards
