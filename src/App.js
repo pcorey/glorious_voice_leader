@@ -767,7 +767,11 @@ function App() {
             chord. This time make it an Fmaj7. Glorious Voice Leader will darken
             the frets that are used by voicings with the best voice leading from
             the previous Cmaj7. Rinse and repeat! But don't actually rinse.
-            Rinsing is bad for computers.
+            Rinsing is bad for computers.{" "}
+            <a href="http://www.petecorey.com/blog/2019/09/30/all-hail-glorious-voice-leader/">
+              Check out this post
+            </a>{" "}
+            for a more in-depth rundown and an example progression!
           </p>
           <p style={{}}>
             <strong>What are all these squares and triangles?</strong> - You can
