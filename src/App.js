@@ -9,8 +9,9 @@ import voicings from "./voicings";
 import { Button } from "semantic-ui-react";
 import { Checkbox } from "semantic-ui-react";
 import { Dropdown } from "semantic-ui-react";
-import { Select } from "semantic-ui-react";
 import { Icon } from "semantic-ui-react";
+import { Radio } from "semantic-ui-react";
+import { Select } from "semantic-ui-react";
 import { grahamScan2 } from "@thi.ng/geom-hull";
 import { sutherlandHodgeman } from "@thi.ng/geom-clip";
 import { useEffect } from "react";
@@ -91,6 +92,7 @@ const Fretboard = React.memo(
     onClickAdd = () => {},
     onClickRemove = () => {},
     previousChord,
+    allowOpen,
     sharps,
     tuning
   }) => {
@@ -501,104 +503,109 @@ const Fretboard = React.memo(
   _.isEqual
 );
 
-const Fretboards = ({ chords, setAndCacheChords, sharps, tuning }) => {
-  return (
-    <div>
-      {_.map(chords, (chord, i) => {
-        return (
-          <div key={chord.key} style={{ margin: "4em 0" }}>
-            <Fretboard
-              tuning={tuning}
-              sharps={sharps}
-              chord={chord}
-              previousChord={i == 0 ? undefined : chords[i - 1]}
-              onClickFret={({ string, fret }, e) => {
-                chord = _.cloneDeep(chord);
-                if (e.shiftKey) {
-                  delete chord.labels[[string, fret]];
-                  _.remove(chord.notes, note =>
-                    _.isEqual(note, [string, fret])
-                  );
-                } else {
-                  if (_.isUndefined(chord.labels[[string, fret]])) {
-                    chord.labels[[string, fret]] = -1;
-                    chord.notes.push([string, fret]);
-                  }
-                  chord.labels[[string, fret]]++;
-                  if (chord.labels[[string, fret]] > 4) {
+const Fretboards = React.memo(
+  ({ chords, setAndCacheChords, allowOpen, sharps, tuning }) => {
+    return (
+      <div>
+        {_.map(chords, (chord, i) => {
+          return (
+            <div key={chord.key} style={{ margin: "4em 0" }}>
+              <Fretboard
+                allowOpen={allowOpen}
+                tuning={tuning}
+                sharps={sharps}
+                chord={chord}
+                previousChord={i == 0 ? undefined : chords[i - 1]}
+                onClickFret={({ string, fret }, e) => {
+                  chord = _.cloneDeep(chord);
+                  if (e.shiftKey) {
                     delete chord.labels[[string, fret]];
                     _.remove(chord.notes, note =>
                       _.isEqual(note, [string, fret])
                     );
+                  } else {
+                    if (_.isUndefined(chord.labels[[string, fret]])) {
+                      chord.labels[[string, fret]] = -1;
+                      chord.notes.push([string, fret]);
+                    }
+                    chord.labels[[string, fret]]++;
+                    if (chord.labels[[string, fret]] > 4) {
+                      delete chord.labels[[string, fret]];
+                      _.remove(chord.notes, note =>
+                        _.isEqual(note, [string, fret])
+                      );
+                    }
                   }
-                }
-                chords[i] = chord;
-                setAndCacheChords(_.map(chords, _.identity));
-              }}
-              onChangeRoot={(event, { value: root }) => {
-                chord = _.cloneDeep(chord);
-                chord.root = root;
-                chord.notes = [];
-                chord.labels = {};
-                chord.voicings = _.chain(chord.qualities)
-                  .map(quality =>
-                    _.map(quality, base => (base + chord.root) % 12)
-                  )
-                  .map(quality => voicings(quality, tuning))
-                  .flatten()
-                  .uniqWith(_.isEqual)
-                  .value();
-                chords[i] = chord;
-                setAndCacheChords(_.map(chords, _.identity));
-              }}
-              onChangeQualities={(event, { value: qualities }) => {
-                chord = _.cloneDeep(chord);
-                chord.qualities = _.map(qualities, JSON.parse);
-                chord.notes = [];
-                chord.labels = {};
-                chord.voicings = _.chain(chord.qualities)
-                  .map(quality =>
-                    _.map(quality, base => (base + chord.root) % 12)
-                  )
-                  .map(quality => voicings(quality, tuning))
-                  .flatten()
-                  .uniqWith(_.isEqual)
-                  .value();
-                chords[i] = chord;
-                setAndCacheChords(_.map(chords, _.identity));
-              }}
-              onClickAdd={() => {
-                setAndCacheChords(
-                  _.flatten([
-                    _.take(chords, i + 1),
-                    {
-                      key: Math.random(),
-                      qualities: [],
-                      notes: [],
-                      labels: {},
-                      voicings: []
-                    },
-                    _.drop(chords, i + 1)
-                  ])
-                );
-              }}
-              onClickRemove={() => {
-                if (_.size(chords) > 1) {
-                  _.pullAt(chords, i);
+                  chords[i] = chord;
                   setAndCacheChords(_.map(chords, _.identity));
-                }
-              }}
-            />
-          </div>
-        );
-      })}
-    </div>
-  );
-};
+                }}
+                onChangeRoot={(event, { value: root }) => {
+                  chord = _.cloneDeep(chord);
+                  chord.root = root;
+                  chord.notes = [];
+                  chord.labels = {};
+                  chord.voicings = _.chain(chord.qualities)
+                    .map(quality =>
+                      _.map(quality, base => (base + chord.root) % 12)
+                    )
+                    .map(quality => voicings(quality, tuning, allowOpen))
+                    .flatten()
+                    .uniqWith(_.isEqual)
+                    .value();
+                  chords[i] = chord;
+                  setAndCacheChords(_.map(chords, _.identity));
+                }}
+                onChangeQualities={(event, { value: qualities }) => {
+                  chord = _.cloneDeep(chord);
+                  chord.qualities = _.map(qualities, JSON.parse);
+                  chord.notes = [];
+                  chord.labels = {};
+                  chord.voicings = _.chain(chord.qualities)
+                    .map(quality =>
+                      _.map(quality, base => (base + chord.root) % 12)
+                    )
+                    .map(quality => voicings(quality, tuning, allowOpen))
+                    .flatten()
+                    .uniqWith(_.isEqual)
+                    .value();
+                  chords[i] = chord;
+                  setAndCacheChords(_.map(chords, _.identity));
+                }}
+                onClickAdd={() => {
+                  setAndCacheChords(
+                    _.flatten([
+                      _.take(chords, i + 1),
+                      {
+                        key: Math.random(),
+                        qualities: [],
+                        notes: [],
+                        labels: {},
+                        voicings: []
+                      },
+                      _.drop(chords, i + 1)
+                    ])
+                  );
+                }}
+                onClickRemove={() => {
+                  if (_.size(chords) > 1) {
+                    _.pullAt(chords, i);
+                    setAndCacheChords(_.map(chords, _.identity));
+                  }
+                }}
+              />
+            </div>
+          );
+        })}
+      </div>
+    );
+  },
+  _.isEqual
+);
 
 const parse = hash => {
   let initial = {
     sharps: false,
+    allowOpen: false,
     tuning: [40, 45, 50, 55, 59, 64],
     chords: [
       {
@@ -629,19 +636,22 @@ function App() {
   let urlParams = new URLSearchParams(window.location.search);
   let hash = window.location.hash.slice(1);
   let {
+    allowOpen: initialAllowOpen,
     sharps: initialSharps,
     tuning: initialTuning,
     chords: initialChords
   } = parse(hash);
 
+  let [allowOpen, setAllowOpen] = useState(initialAllowOpen);
   let [sharps, setSharps] = useState(initialSharps);
   let [tuning, setTuning] = useState(initialTuning);
   let [chords, setChords] = useState(initialChords);
+  let [settings, setSettings] = useState(false);
 
   _.map(chords, chord => {
     chord.voicings = _.chain(chord.qualities)
       .map(quality => _.map(quality, base => (base + chord.root) % 12))
-      .map(quality => voicings(quality, tuning))
+      .map(quality => voicings(quality, tuning, allowOpen))
       .flatten()
       .uniqWith(_.isEqual)
       .value();
@@ -662,7 +672,7 @@ function App() {
 
   const setAndCacheChords = chords => {
     setChords(chords);
-    cache({ sharps, tuning, chords });
+    cache({ allowOpen, sharps, tuning, chords });
   };
 
   const onChangeTuning = (event, { value: tuning }) => {
@@ -678,12 +688,17 @@ function App() {
     ];
     setTuning(JSON.parse(tuning));
     setChords(chords);
-    cache({ sharps, tuning, chords });
+    cache({ allowOpen, sharps, tuning, chords });
   };
 
   const onChangeSharps = sharps => {
     setSharps(sharps);
     cache({ sharps, tuning, chords });
+  };
+
+  const onChangeAllowOpen = allowOpen => {
+    setAllowOpen(allowOpen);
+    cache({ allowOpen, sharps, tuning, chords });
   };
 
   return (
@@ -745,10 +760,65 @@ function App() {
                 ♯
               </Button>
             </Button.Group>
+            <Button
+              icon
+              style={{
+                marginLeft: "1rem",
+                backgroundColor: !settings
+                  ? "rgb(248, 248, 248)"
+                  : "rgb(208, 224, 241)"
+              }}
+              onClick={() => setSettings(!settings)}
+            >
+              <Icon name="cog" />
+            </Button>
           </div>
         </div>
 
+        {settings && (
+          <div
+            style={{
+              margin: "2rem",
+              padding: "2rem",
+              backgroundColor: "rgb(208, 224, 241, 0.5)"
+            }}
+          >
+            <h2
+              style={{
+                fontSize: "1.6rem",
+                fontWeight: "100",
+                textTransform: "uppercase"
+              }}
+            >
+              Settings:
+            </h2>
+            <Button.Group>
+              <Button
+                style={{
+                  backgroundColor: !allowOpen
+                    ? "rgb(208, 224, 241)"
+                    : "rgb(248, 248, 248)"
+                }}
+                onClick={() => onChangeAllowOpen(false)}
+              >
+                Don't allow open strings in higher voicings
+              </Button>
+              <Button
+                style={{
+                  backgroundColor: !allowOpen
+                    ? "rgb(248, 248, 248)"
+                    : "rgb(208, 224, 241)"
+                }}
+                onClick={() => onChangeAllowOpen(true)}
+              >
+                Allow open strings in higher voicings
+              </Button>
+            </Button.Group>
+          </div>
+        )}
+
         <Fretboards
+          allowOpen={allowOpen}
           chords={chords}
           sharps={sharps}
           tuning={tuning}

@@ -23,9 +23,13 @@ const has_doubled_strings = chord => {
   );
 };
 
-const has_unplayable_stretch = max_reach => chord => {
-  let [_1, min] = _.minBy(chord, ([string, fret]) => fret);
-  let [_2, max] = _.maxBy(chord, ([string, fret]) => fret);
+const has_unplayable_stretch = (max_reach, allowOpen) => chord => {
+  let filteredChord = _.reject(
+    chord,
+    ([string, fret]) => fret === 0 && allowOpen
+  );
+  let [_1, min] = _.minBy(filteredChord, ([string, fret]) => fret);
+  let [_2, max] = _.maxBy(filteredChord, ([string, fret]) => fret);
   return max - min > max_reach;
 };
 
@@ -45,6 +49,7 @@ const flatten_chord = strings => chord =>
 export default (
   notes,
   tuning,
+  allowOpen,
   options = {
     frets: 18,
     max_reach: 5
@@ -53,13 +58,10 @@ export default (
   let { frets, max_reach } = options;
   let strings = _.size(tuning);
 
-  return (
-    _.chain(notes)
-      .map(find_note_on_fretboard(frets, strings, tuning))
-      .thru(notes_on_fretboard => _.product.apply(null, notes_on_fretboard))
-      .reject(has_doubled_strings)
-      .reject(has_unplayable_stretch(max_reach))
-      // .map(flatten_chord(strings))
-      .value()
-  );
+  return _.chain(notes)
+    .map(find_note_on_fretboard(frets, strings, tuning))
+    .thru(notes_on_fretboard => _.product.apply(null, notes_on_fretboard))
+    .reject(has_doubled_strings)
+    .reject(has_unplayable_stretch(max_reach, allowOpen))
+    .value();
 };
