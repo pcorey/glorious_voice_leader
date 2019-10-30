@@ -1,18 +1,26 @@
 import "lodash.product";
 import _ from "lodash";
 
-const find_note_on_fretboard = (frets, strings, tuning) => note => {
+const findNoteOnFretboard = (frets, strings, tuning, capo) => note => {
   const is_note = ([string, fret]) => {
     let note_to_test = tuning[string] + fret;
     return note_to_test === note || note_to_test % 12 === note;
   };
 
-  return _.chain(_.product(_.range(strings), _.range(frets)))
+  return _.chain(
+    _.product(
+      _.range(strings),
+      _.chain(frets - capo)
+        .range()
+        .map(fret => fret + capo)
+        .value()
+    )
+  )
     .filter(is_note)
     .value();
 };
 
-const has_doubled_strings = chord => {
+const hasDoubledStrings = chord => {
   return (
     _.size(chord) !==
     _.chain(chord)
@@ -23,45 +31,29 @@ const has_doubled_strings = chord => {
   );
 };
 
-const has_unplayable_stretch = (max_reach, allowOpen) => chord => {
+const hasUnplayableStretch = (maxReach, allowOpen) => chord => {
   let filteredChord = _.reject(
     chord,
     ([string, fret]) => fret === 0 && allowOpen
   );
   let [_1, min] = _.minBy(filteredChord, ([string, fret]) => fret);
   let [_2, max] = _.maxBy(filteredChord, ([string, fret]) => fret);
-  return max - min > max_reach;
+  return max - min > maxReach;
 };
-
-const flatten_chord = strings => chord =>
-  _.reduce(
-    chord,
-    (chord, [string, fret]) => {
-      chord[string] = fret;
-      return chord;
-    },
-    _.chain(strings)
-      .range()
-      .map(() => undefined)
-      .value()
-  );
 
 export default (
   notes,
   tuning,
   allowOpen,
-  options = {
-    frets: 18,
-    max_reach: 5
-  }
+  frets = 18,
+  maxReach = 5,
+  capo = 0
 ) => {
-  let { frets, max_reach } = options;
   let strings = _.size(tuning);
-
   return _.chain(notes)
-    .map(find_note_on_fretboard(frets, strings, tuning))
-    .thru(notes_on_fretboard => _.product.apply(null, notes_on_fretboard))
-    .reject(has_doubled_strings)
-    .reject(has_unplayable_stretch(max_reach, allowOpen))
+    .map(findNoteOnFretboard(frets, strings, tuning, capo))
+    .thru(notesOnFretboard => _.product.apply(null, notesOnFretboard))
+    .reject(hasDoubledStrings)
+    .reject(hasUnplayableStretch(maxReach, allowOpen))
     .value();
 };

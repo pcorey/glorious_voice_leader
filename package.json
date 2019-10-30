@@ -9,9 +9,11 @@
     "lodash": "^4.17.14",
     "lodash.product": "^18.9.19",
     "pako": "^1.0.10",
+    "prettier": "^1.18.2",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
     "react-scripts": "3.0.1",
+    "react-semantic-ui-range": "^0.7.0",
     "semantic-ui-css": "^2.4.1",
     "semantic-ui-react": "^0.87.3"
   },

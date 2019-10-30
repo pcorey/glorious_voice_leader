@@ -10,8 +10,10 @@ import { Button } from "semantic-ui-react";
 import { Checkbox } from "semantic-ui-react";
 import { Dropdown } from "semantic-ui-react";
 import { Icon } from "semantic-ui-react";
+import { Label } from "semantic-ui-react";
 import { Radio } from "semantic-ui-react";
 import { Select } from "semantic-ui-react";
+import { Slider } from "react-semantic-ui-range";
 import { grahamScan2 } from "@thi.ng/geom-hull";
 import { sutherlandHodgeman } from "@thi.ng/geom-clip";
 import { useEffect } from "react";
@@ -94,9 +96,13 @@ const Fretboard = React.memo(
     previousChord,
     allowOpen,
     sharps,
-    tuning
+    tuning,
+    frets,
+    maxReach,
+    capo
   }) => {
     let ref = useRef();
+    let strings = _.size(tuning);
 
     let notesInChord = _.chain(chord)
       .get("notes")
@@ -118,8 +124,8 @@ const Fretboard = React.memo(
         .slice(0, -2);
       let height = width * 0.2;
       return {
-        x: (fret + 1) * (width * ratio / 19),
-        y: (string + 1) * (height * ratio / 7)
+        x: (fret + 1) * ((width * ratio) / (frets + 1)),
+        y: (string + 1) * ((height * ratio) / (strings + 1))
       };
     };
 
@@ -132,7 +138,7 @@ const Fretboard = React.memo(
       );
     });
 
-    const f = x => x * 2 / (x * 2 + 1);
+    const f = x => (x * 2) / (x * 2 + 1);
 
     let h = _.chain(chord.voicings)
       .thru(voicings =>
@@ -175,7 +181,7 @@ const Fretboard = React.memo(
       let width = getComputedStyle(canvas)
         .getPropertyValue("width")
         .slice(0, -2);
-      return width * ratio / 19;
+      return (width * ratio) / (frets + 1);
     };
 
     const fretHeight = () => {
@@ -186,7 +192,7 @@ const Fretboard = React.memo(
         .getPropertyValue("width")
         .slice(0, -2);
       let height = width * 0.2;
-      return height * ratio / 7;
+      return (height * ratio) / (strings + 1);
     };
 
     useEffect(() => {
@@ -211,7 +217,7 @@ const Fretboard = React.memo(
         .range()
         .map(string => {
           let { x: fromX, y: fromY } = fretPosition(string, 0);
-          let { x: toX, y: toY } = fretPosition(string, 17);
+          let { x: toX, y: toY } = fretPosition(string, frets - 1);
           context.beginPath();
           context.moveTo(fromX, fromY);
           context.lineTo(toX, toY);
@@ -220,7 +226,7 @@ const Fretboard = React.memo(
         .value();
 
       // Draw frets
-      _.chain(18)
+      _.chain(frets)
         .range()
         .map(fret => {
           let { x: fromX, y: fromY } = fretPosition(0, fret);
@@ -273,6 +279,14 @@ const Fretboard = React.memo(
         })
         .value();
 
+      // Draw capo
+      let { x: fromX, y: fromY } = fretPosition(-1, 0);
+      let { x: toX, y: toY } = fretPosition(strings, capo - 1);
+      context.fillStyle = "rgba(255,255,255,0.75)";
+      context.beginPath();
+      context.rect(fromX - 2, fromY, toX - 2, toY);
+      context.fill();
+
       // // Draw quality
       // context.fillStyle = "#ccc";
       // context.textAlign = "left";
@@ -323,7 +337,7 @@ const Fretboard = React.memo(
 
       const drawSolid = (string, fret) => {
         let { x, y } = fretPosition(string, fret);
-        let offset = fretHeight() / 2 * 0.75;
+        let offset = (fretHeight() / 2) * 0.75;
         context.fillStyle = "#333";
         context.beginPath();
         context.arc(x, y, offset, 0, 2 * Math.PI, true);
@@ -339,13 +353,13 @@ const Fretboard = React.memo(
         let { x, y } = fretPosition(string, fret);
         context.strokeStyle = "#333";
         context.beginPath();
-        context.arc(x, y, fretHeight() / 2 * 0.75, 0, 2 * Math.PI, true);
+        context.arc(x, y, (fretHeight() / 2) * 0.75, 0, 2 * Math.PI, true);
         context.stroke();
       };
 
       const drawTriangle = (string, fret) => {
         let { x, y } = fretPosition(string, fret);
-        let offset = fretHeight() / 2 * 0.5 * 1.41;
+        let offset = (fretHeight() / 2) * 0.5 * 1.41;
         let lift = 0;
         context.strokeStyle = "#333";
         context.beginPath();
@@ -360,7 +374,7 @@ const Fretboard = React.memo(
 
       const drawX = (string, fret) => {
         let { x, y } = fretPosition(string, fret);
-        let offset = fretHeight() / 2 * 0.5;
+        let offset = (fretHeight() / 2) * 0.5;
         context.strokeStyle = "#333";
         context.beginPath();
         context.moveTo(x - offset, y + offset);
@@ -374,7 +388,7 @@ const Fretboard = React.memo(
 
       const drawSquare = (string, fret) => {
         let { x, y } = fretPosition(string, fret);
-        let offset = fretHeight() / 2 * 0.66;
+        let offset = (fretHeight() / 2) * 0.66;
         context.strokeStyle = "#333";
         context.beginPath();
         context.rect(x - offset, y - offset, offset * 2, offset * 2);
@@ -416,7 +430,7 @@ const Fretboard = React.memo(
       let fret = Math.floor((x - fretWidth() / 2) / fretWidth());
       let string =
         _.size(tuning) - 1 - Math.floor((y - fretHeight() / 2) / fretHeight());
-      if (fret >= 0 && fret < 18 && string >= 0 && string < _.size(tuning)) {
+      if (fret >= 0 && fret < frets && string >= 0 && string < _.size(tuning)) {
         onClickFret({ string, fret }, e);
       }
     };
@@ -504,7 +518,16 @@ const Fretboard = React.memo(
 );
 
 const Fretboards = React.memo(
-  ({ chords, setAndCacheChords, allowOpen, sharps, tuning }) => {
+  ({
+    chords,
+    setAndCacheChords,
+    allowOpen,
+    sharps,
+    tuning,
+    frets,
+    maxReach,
+    capo
+  }) => {
     return (
       <div>
         {_.map(chords, (chord, i) => {
@@ -515,6 +538,9 @@ const Fretboards = React.memo(
                 tuning={tuning}
                 sharps={sharps}
                 chord={chord}
+                frets={frets}
+                maxReach={maxReach}
+                capo={capo}
                 previousChord={i == 0 ? undefined : chords[i - 1]}
                 onClickFret={({ string, fret }, e) => {
                   chord = _.cloneDeep(chord);
@@ -548,7 +574,16 @@ const Fretboards = React.memo(
                     .map(quality =>
                       _.map(quality, base => (base + chord.root) % 12)
                     )
-                    .map(quality => voicings(quality, tuning, allowOpen))
+                    .map(quality =>
+                      voicings(
+                        quality,
+                        tuning,
+                        allowOpen,
+                        frets,
+                        maxReach,
+                        capo
+                      )
+                    )
                     .flatten()
                     .uniqWith(_.isEqual)
                     .value();
@@ -564,7 +599,16 @@ const Fretboards = React.memo(
                     .map(quality =>
                       _.map(quality, base => (base + chord.root) % 12)
                     )
-                    .map(quality => voicings(quality, tuning, allowOpen))
+                    .map(quality =>
+                      voicings(
+                        quality,
+                        tuning,
+                        allowOpen,
+                        frets,
+                        maxReach,
+                        capo
+                      )
+                    )
                     .flatten()
                     .uniqWith(_.isEqual)
                     .value();
@@ -607,6 +651,9 @@ const parse = hash => {
     sharps: false,
     allowOpen: false,
     tuning: [40, 45, 50, 55, 59, 64],
+    frets: 18,
+    maxReach: 5,
+    capo: 0,
     chords: [
       {
         key: Math.random(),
@@ -639,7 +686,10 @@ function App() {
     allowOpen: initialAllowOpen,
     sharps: initialSharps,
     tuning: initialTuning,
-    chords: initialChords
+    chords: initialChords,
+    frets: initialFrets,
+    maxReach: initialMaxReach,
+    capo: initialCapo
   } = parse(hash);
 
   let [allowOpen, setAllowOpen] = useState(initialAllowOpen);
@@ -647,11 +697,16 @@ function App() {
   let [tuning, setTuning] = useState(initialTuning);
   let [chords, setChords] = useState(initialChords);
   let [settings, setSettings] = useState(false);
+  let [frets, setFrets] = useState(initialFrets);
+  let [maxReach, setMaxReach] = useState(initialMaxReach);
+  let [capo, setCapo] = useState(initialCapo);
 
   _.map(chords, chord => {
     chord.voicings = _.chain(chord.qualities)
       .map(quality => _.map(quality, base => (base + chord.root) % 12))
-      .map(quality => voicings(quality, tuning, allowOpen))
+      .map(quality =>
+        voicings(quality, tuning, allowOpen, frets, maxReach, capo)
+      )
       .flatten()
       .uniqWith(_.isEqual)
       .value();
@@ -672,7 +727,7 @@ function App() {
 
   const setAndCacheChords = chords => {
     setChords(chords);
-    cache({ allowOpen, sharps, tuning, chords });
+    cache({ allowOpen, sharps, tuning, chords, frets, maxReach, capo });
   };
 
   const onChangeTuning = (event, { value: tuning }) => {
@@ -688,17 +743,32 @@ function App() {
     ];
     setTuning(JSON.parse(tuning));
     setChords(chords);
-    cache({ allowOpen, sharps, tuning, chords });
+    cache({ allowOpen, sharps, tuning, chords, frets, maxReach, capo });
   };
 
   const onChangeSharps = sharps => {
     setSharps(sharps);
-    cache({ sharps, tuning, chords });
+    cache({ allowOpen, sharps, tuning, chords, frets, maxReach, capo });
   };
 
   const onChangeAllowOpen = allowOpen => {
     setAllowOpen(allowOpen);
-    cache({ allowOpen, sharps, tuning, chords });
+    cache({ allowOpen, sharps, tuning, chords, frets, maxReach, capo });
+  };
+
+  const onChangeFrets = frets => {
+    setFrets(frets);
+    cache({ allowOpen, sharps, tuning, chords, frets, maxReach, capo });
+  };
+
+  const onChangeMaxReach = maxReach => {
+    setMaxReach(maxReach);
+    cache({ allowOpen, sharps, tuning, chords, frets, maxReach, capo });
+  };
+
+  const onChangeCapo = capo => {
+    setCapo(capo);
+    cache({ allowOpen, sharps, tuning, chords, frets, maxReach, capo });
   };
 
   return (
@@ -787,7 +857,8 @@ function App() {
               style={{
                 fontSize: "1.6rem",
                 fontWeight: "100",
-                textTransform: "uppercase"
+                textTransform: "uppercase",
+                margin: "0 0 2rem 0"
               }}
             >
               Settings:
@@ -814,6 +885,36 @@ function App() {
                 Allow open strings in higher voicings
               </Button>
             </Button.Group>
+
+            <h3>Frets: {frets}</h3>
+            <Slider
+              color="#888"
+              discrete
+              value={frets}
+              settings={{ min: 12, max: 24, step: 1, onChange: onChangeFrets }}
+            />
+
+            <h3>Max Reach: {maxReach}</h3>
+            <Slider
+              color="#888"
+              discrete
+              value={maxReach}
+              onChange={onChangeMaxReach}
+              settings={{
+                min: 0,
+                max: 24,
+                step: 1,
+                onChange: onChangeMaxReach
+              }}
+            />
+
+            <h3>Capo: {capo}</h3>
+            <Slider
+              color="#888"
+              discrete
+              value={capo}
+              settings={{ min: 0, max: 24, step: 1, onChange: onChangeCapo }}
+            />
           </div>
         )}
 
@@ -823,6 +924,9 @@ function App() {
           sharps={sharps}
           tuning={tuning}
           setAndCacheChords={setAndCacheChords}
+          frets={frets}
+          maxReach={maxReach}
+          capo={capo}
         />
         <div style={{ margin: "-2em 2em 0" }}>
           <p style={{}}>
@@ -851,7 +955,8 @@ function App() {
             inspired by{" "}
             <a href="http://www.tedgreene.com/images/lessons/students/PaulVachon/HowToReadTedGreeneChordDiagrams.pdf">
               Ted Greene style chord charts
-            </a>. Keep clicking, or shift click on the fret and they'll go away.
+            </a>
+            . Keep clicking, or shift click on the fret and they'll go away.
           </p>
           <p style={{}}>
             <strong>I don't like your recommendations!</strong> - I'm sorry you
