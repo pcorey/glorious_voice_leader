@@ -54,7 +54,10 @@ const qualities = _.chain([
   { text: "major", value: JSON.stringify([0, 4, 7]) },
   { text: "minor", value: JSON.stringify([0, 3, 7]) },
   { text: "dim", value: JSON.stringify([0, 3, 6]) },
-  { text: "aug", value: JSON.stringify([0, 5, 7]) }
+  { text: "aug", value: JSON.stringify([0, 5, 7]) },
+  { text: "sus2", value: JSON.stringify([0, 2, 7]) },
+  { text: "sus4", value: JSON.stringify([0, 5, 7]) },
+  { text: "add9", value: JSON.stringify([0, 4, 7, 2]) }
 ])
   .sortBy("text")
   .map(option => ({ key: JSON.stringify(option), ...option }))
