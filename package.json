@@ -3,6 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "@react-hook/window-size": "^1.0.13",
     "@thi.ng/geom-clip": "^0.1.2",
     "@thi.ng/geom-hull": "^0.0.22",
     "@thi.ng/geom-poly-utils": "^0.1.20",
@@ -15,7 +16,8 @@
     "react-scripts": "3.0.1",
     "react-semantic-ui-range": "^0.7.0",
     "semantic-ui-css": "^2.4.1",
-    "semantic-ui-react": "^0.87.3"
+    "semantic-ui-react": "^0.87.3",
+    "styled-components": "^5.0.1"
   },
   "scripts": {
     "start": "react-scripts start",

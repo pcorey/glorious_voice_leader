@@ -31,10 +31,10 @@ const hasDoubledStrings = chord => {
   );
 };
 
-const hasUnplayableStretch = (maxReach, allowOpen) => chord => {
+const hasUnplayableStretch = (maxReach, allowOpen, capo) => chord => {
   let filteredChord = _.reject(
     chord,
-    ([string, fret]) => fret === 0 && allowOpen
+    ([string, fret]) => fret === capo && allowOpen
   );
   let [_1, min] = _.minBy(filteredChord, ([string, fret]) => fret);
   let [_2, max] = _.maxBy(filteredChord, ([string, fret]) => fret);
@@ -54,6 +54,6 @@ export default (
     .map(findNoteOnFretboard(frets, strings, tuning, capo))
     .thru(notesOnFretboard => _.product.apply(null, notesOnFretboard))
     .reject(hasDoubledStrings)
-    .reject(hasUnplayableStretch(maxReach, allowOpen))
+    .reject(hasUnplayableStretch(maxReach, allowOpen, capo))
     .value();
 };

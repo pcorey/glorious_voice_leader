@@ -1,9 +1,8 @@
 import "lodash.product";
 import _ from "lodash";
 
-const note = (string, fret) => {
-  let tuning = [40, 45, 50, 55, 59, 64];
-  return tuning[5 - string] + fret;
+const note = (string, fret, tuning) => {
+  return tuning[string] + fret;
 };
 
 const chunk = (list, n) => {
@@ -22,18 +21,13 @@ const chunk = (list, n) => {
     .value();
 };
 
-export default previousChord => {
+export default (previousChord, tuning) => {
   if (_.isEmpty(previousChord.notes)) {
     return () => 0;
   }
 
   let previousNotes = _.chain(previousChord.notes)
-    .map(([string, fret]) => {
-      if (!previousChord.labels[[string, fret]]) {
-        return note(5 - string, fret);
-      }
-    })
-    .reject(_.isUndefined)
+    .map(([string, fret]) => note(string, fret, tuning))
     .sort()
     .value();
 
@@ -43,7 +37,7 @@ export default previousChord => {
     }
 
     let notes = _.chain(voicing)
-      .map(([string, fret]) => note(5 - string, fret))
+      .map(([string, fret]) => note(string, fret, tuning))
       .sort()
       .value();
 
