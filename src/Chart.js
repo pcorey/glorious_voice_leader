@@ -7,8 +7,6 @@ import styled from "styled-components";
 import { useEffect } from "react";
 import { useRef } from "react";
 
-const fretSizeRatio = 1.5;
-
 const Wrapper = styled.div`
   display: flex;
   flex-direction: column;
@@ -122,12 +120,28 @@ const Chart = ({
     context.fillStyle = "#666";
     context.strokeStyle = "#666";
     context.lineWidth = 2;
+
     let noteMap = _.chain(chord.notes)
       .reduce((map, v) => {
         map[v] = true;
         return map;
       }, {})
       .value();
+
+    let quality = _.chain(chord.notes)
+      .map(([string, fret]) => tuning[string] + fret)
+      .map(note => {
+        let interval = note - chord.root;
+        if (interval < 0) {
+          interval += 12;
+        }
+        return interval % 12;
+      })
+      .sortBy(_.identity)
+      .thru(intervals => JSON.stringify(intervals))
+      .thru(value => _.find(qualities, { value }))
+      .value();
+
     for (let fret = 0; fret < frets; fret++) {
       for (let string = 0; string < _.size(tuning); string++) {
         if (min === 0) {
@@ -172,9 +186,7 @@ const Chart = ({
     context.textBaseline = "bottom";
     context.fillStyle = "#aaa";
     context.fillText(
-      `${noteName(chord.root, sharps)}${
-        chord.quality ? chord.quality.text : "?"
-      }`,
+      `${noteName(chord.root, sharps)}${_.get(quality, "text", "?")}`,
       width * ratio - fretWidth / 2,
       height * ratio
     );

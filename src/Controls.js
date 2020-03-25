@@ -2,14 +2,9 @@ import React from "react";
 import _ from "lodash";
 import qualities from "./qualities";
 import styled from "styled-components";
-import tunings from "./tunings";
-import voicings from "./voicings";
 import { Button } from "semantic-ui-react";
 import { Dropdown } from "semantic-ui-react";
 import { Icon } from "semantic-ui-react";
-import { useEffect } from "react";
-import { useRef } from "react";
-import { useState } from "react";
 
 const Wrapper = styled.div`
   display: flex;

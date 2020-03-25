@@ -4,7 +4,6 @@ import _ from "lodash";
 import getHeatmap from "./heatmap";
 import getPixelRatio from "./getPixelRatio";
 import getVoicings from "./voicings";
-import qualities from "./qualities";
 import semitoneDistance from "./semitoneDistance";
 import styled from "styled-components";
 import { useEffect } from "react";
@@ -335,26 +334,6 @@ const Fretboard = ({
 
     let fret = Math.floor((y - stringTop) / fretHeight);
     let string = Math.floor((x - fretsLeft - fretWidth / 2) / fretWidth) + 1;
-
-    // let notes = [...chord.notes, [string, fret]];
-
-    // let voicing =
-    //   _.size(notes) ===
-    //   _.chain(voicings)
-    //     .first()
-    //     .size()
-    //     .value()
-    //     ? _.find(relevantVoicings, voicing => {
-    //         return _.every(notes, note =>
-    //           _.chain(voicing)
-    //             .map(note => note.toString())
-    //             .includes(note.toString())
-    //             .value()
-    //         );
-    //       })
-    //     : undefined;
-
-    // let quality = _.find(qualities, { value: JSON.stringify(voicing) });
 
     if (
       _.isFunction(onClickFret) &&

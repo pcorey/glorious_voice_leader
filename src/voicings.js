@@ -36,8 +36,8 @@ const hasUnplayableStretch = (maxReach, allowOpen, capo) => chord => {
     chord,
     ([string, fret]) => fret === capo && allowOpen
   );
-  let [_1, min] = _.minBy(filteredChord, ([string, fret]) => fret);
-  let [_2, max] = _.maxBy(filteredChord, ([string, fret]) => fret);
+  let [, min] = _.minBy(filteredChord, ([string, fret]) => fret);
+  let [, max] = _.maxBy(filteredChord, ([string, fret]) => fret);
   return max - min > maxReach;
 };
 

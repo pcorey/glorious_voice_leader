@@ -5,35 +5,19 @@ import Fretboard from "./Fretboard";
 import React from "react";
 import _ from "lodash";
 import pako from "pako";
-import qualities from "./qualities";
 import styled from "styled-components";
 import tunings from "./tunings";
-import voicings from "./voicings";
 import { Button } from "semantic-ui-react";
 import { Dropdown } from "semantic-ui-react";
 import { Form } from "semantic-ui-react";
 import { Icon } from "semantic-ui-react";
 import { Radio } from "semantic-ui-react";
-import { Select } from "semantic-ui-react";
 import { Slider } from "react-semantic-ui-range";
 import { useEffect } from "react";
-import { useRef } from "react";
 import { useState } from "react";
 import { useWindowSize } from "@react-hook/window-size";
 
 const v = "1.0.0";
-
-const note = (string, fret, tuning) => {
-  return (tuning[_.size(tuning) - 1 - string] + fret) % 12;
-};
-
-const noteName = (string, fret, sharps, tuning) => {
-  return (sharps
-    ? ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"]
-    : ["C", "Db", "D", "Eb", "E", "F", "Gb", "G", "Ab", "A", "Bb", "B"])[
-    note(string, fret, tuning)
-  ];
-};
 
 const Page = styled.div`
   display: flex;
@@ -85,14 +69,6 @@ const Charts = styled.div`
   grid-template-columns: repeat(6, 1fr);
   grid-gap: 0;
   grid-auto-flow: row dense;
-`;
-
-const Add = styled.div`
-  flex-basis: 100%;
-  background-color: #f8f8f8;
-  font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
-    Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
-  padding: 1rem;
 `;
 
 const FretSizeContext = React.createContext({ height: 0, width: 0 });
@@ -418,7 +394,7 @@ const App = ({
             <Charts>
               {_.map(chords, (chord, i) => {
                 return (
-                  <>
+                  <React.Fragment key={chord.key}>
                     <Chart
                       {...{
                         fretHeight,
@@ -442,7 +418,7 @@ const App = ({
                         }}
                       />
                     )}
-                  </>
+                  </React.Fragment>
                 );
               })}
             </Charts>

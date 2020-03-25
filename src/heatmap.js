@@ -1,7 +1,5 @@
 import _ from "lodash";
 
-const smoother = 1;
-
 export default (voicings, reducer) => {
   let heatmap = _.chain(voicings)
     .reduce((heatmap, voicing, i) => {
