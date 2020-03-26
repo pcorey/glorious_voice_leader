@@ -31,7 +31,7 @@ const Page = styled.div`
 const Left = styled.div`
   flex: 2;
   background-color: #f8f8f8;
-  padding: 0 2rem;
+  padding: 0 2rem 2rem 2rem;
   font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen,
     Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
   overflow: auto;
@@ -424,13 +424,15 @@ const App = ({
             </Charts>
           </div>
           <p>
-            <strong>Huh?</strong> - Start by picking a root note (like C) and
-            quality (like maj7) for your first chord. Click on the fretboard to
-            pick the four notes you'd like to start with. Next, add another
-            chord. This time make it an Fmaj7. Glorious Voice Leader will darken
-            the frets that are used by voicings with the best voice leading from
-            the previous Cmaj7. Rinse and repeat! But don't actually rinse.
-            Rinsing is bad for computers.{" "}
+            <strong>How does it work?</strong> - Start by picking a root note
+            (like C) and quality (like maj7) for your first chord. Click on the
+            fretboard to pick the four notes you'd like to start with. Next, add
+            another chord. This time make it an Fmaj7. Glorious Voice Leader
+            will darken the frets that are used by voicings with the best voice
+            leading from the previous Cmaj7. <br />
+            <br />
+            Rinse and repeat! But don't actually rinse. Rinsing is bad for
+            computers.{" "}
             <a href="http://www.petecorey.com/blog/2019/09/30/all-hail-glorious-voice-leader/">
               Check out this post
             </a>{" "}
