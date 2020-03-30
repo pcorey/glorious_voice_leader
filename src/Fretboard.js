@@ -15,6 +15,7 @@ const lineWidth = 3;
 const Canvas = styled.canvas`
   width: 100%;
   height: 100%;
+  cursor: pointer;
 `;
 
 const Fretboard = ({

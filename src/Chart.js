@@ -18,6 +18,7 @@ const Canvas = styled.canvas`
   width: 100%;
   height: 100%;
   margin-bottom: 1rem;
+  cursor: pointer;
 `;
 
 const ArrowUp = styled.div`
