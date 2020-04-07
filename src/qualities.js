@@ -22,7 +22,7 @@ const qualities = _.chain([
   { text: "maj", value: getValue([0, 4, 7]) },
   { text: "min", value: getValue([0, 3, 7]) },
   { text: "dim", value: getValue([0, 3, 6]) },
-  { text: "aug", value: getValue([0, 5, 7]) },
+  { text: "aug", value: getValue([0, 4, 8]) },
   { text: "sus2", value: getValue([0, 2, 7]) },
   { text: "sus4", value: getValue([0, 5, 7]) },
   { text: "add9", value: getValue([0, 4, 7, 2]) }
