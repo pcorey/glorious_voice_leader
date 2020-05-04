@@ -247,6 +247,23 @@ const App = ({
   }, [selected, chords]);
 
   useEffect(() => {
+    _.chain(chords)
+      .map(chord => {
+        let notes = [];
+        for (let i = 0; i < chord.notes.length; i++) {
+          notes.push(tuning[chord.notes[i][0]] + chord.notes[i][1]);
+        }
+        return notes;
+      })
+      .thru(chords => {
+        let text = _.chain(chords)
+          .thru(chords => _.zip(...chords))
+          .map(group => _.join(group, " "))
+          .join("\\\n         \\")
+          .value();
+        console.log(`chords = "${text}"`);
+      })
+      .value();
     _.chain({
       v,
       allowOpen,
@@ -409,6 +426,7 @@ const App = ({
                     {selected === i && (
                       <Controls
                         {...{
+                          tuning,
                           chord,
                           sharps,
                           onChangeRoot,

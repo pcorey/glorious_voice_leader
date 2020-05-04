@@ -2,8 +2,8 @@ import "semantic-ui-css/semantic.min.css";
 import React from "react";
 import _ from "lodash";
 import getPixelRatio from "./getPixelRatio";
-import qualities from "./qualities";
 import styled from "styled-components";
+import { qualities } from "./qualities";
 import { useEffect } from "react";
 import { useRef } from "react";
 

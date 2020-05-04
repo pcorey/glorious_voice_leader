@@ -8,6 +8,7 @@
     "@thi.ng/geom-hull": "^0.0.22",
     "@thi.ng/geom-poly-utils": "^0.1.20",
     "lodash": "^4.17.14",
+    "lodash.combinations": "^18.9.19",
     "lodash.product": "^18.9.19",
     "pako": "^1.0.10",
     "prettier": "^1.18.2",

@@ -1,13 +1,15 @@
 import React from "react";
 import _ from "lodash";
-import qualities from "./qualities";
+import getChordNames from "./getChordNames.js";
 import styled from "styled-components";
 import { Button } from "semantic-ui-react";
 import { Dropdown } from "semantic-ui-react";
 import { Icon } from "semantic-ui-react";
+import { qualities } from "./qualities";
 
 const Wrapper = styled.div`
   display: flex;
+  flex-direction: column;
   width: auto;
   background-color: #eee;
   grid-column: 1 / span 6;
@@ -16,7 +18,14 @@ const Wrapper = styled.div`
   margin-bottom: 1rem;
 `;
 
+const Row = styled.div`
+  display: flex;
+  width: 100%;
+  align-items: flex-end;
+`;
+
 const Controls = ({
+  tuning,
   chord,
   sharps,
   onChangeRoot,
@@ -56,83 +65,119 @@ const Controls = ({
 
   return (
     <Wrapper>
-      <div style={{ flex: 0, marginRight: "0.5rem" }}>
-        <strong
+      <Row>
+        <div style={{ flex: 0, marginRight: "0.5rem" }}>
+          <strong
+            style={{
+              display: "block",
+              margin: "0 0.5rem 0.5rem 0",
+              textAlign: "left"
+            }}
+          >
+            Root:
+            <br />
+          </strong>
+          <Dropdown
+            search
+            placeholder="Root"
+            selection
+            options={keys}
+            value={chord.root}
+            onChange={onChangeRoot}
+            style={{
+              minWidth: "auto",
+              minHeight: "auto",
+              width: "100%",
+              margin: 0
+            }}
+          />
+        </div>
+        <div style={{ flex: 1, marginRight: "0.5rem" }}>
+          <strong
+            style={{
+              display: "block",
+              margin: "0 0.5rem 0.5rem 0",
+              textAlign: "left"
+            }}
+          >
+            Quality:
+            <br />
+          </strong>
+          <Dropdown
+            search
+            placeholder="Qualities"
+            multiple
+            selection
+            options={qualities}
+            value={_.map(chord.qualities, quality => JSON.stringify(quality))}
+            onChange={onChangeQualities}
+            style={{
+              minWidth: "auto",
+              minHeight: "auto",
+              width: "100%",
+              margin: 0
+            }}
+          />
+        </div>
+        <Button
+          icon
           style={{
-            display: "block",
-            margin: "0 0.5rem 0.5rem 0",
-            textAlign: "left"
+            flex: 0,
+            fontSize: "1rem",
+            backgroundColor: "#f8f8f8",
+            marginRight: "0.5rem"
           }}
+          onClick={onClickAdd}
         >
-          Root:
-          <br />
-        </strong>
-        <Dropdown
-          search
-          placeholder="Root"
-          selection
-          options={keys}
-          value={chord.root}
-          onChange={onChangeRoot}
+          <Icon name="add circle" />
+        </Button>
+        <Button
+          icon
           style={{
-            minWidth: "auto",
-            minHeight: "auto",
-            width: "100%",
-            margin: 0
+            flex: 0,
+            fontSize: "1rem",
+            backgroundColor: "#f8f8f8",
+            marginRight: "0"
           }}
-        />
-      </div>
-      <div style={{ flex: 1, marginRight: "0.5rem" }}>
-        <strong
-          style={{
-            display: "block",
-            margin: "0 0.5rem 0.5rem 0",
-            textAlign: "left"
-          }}
+          onClick={onClickRemove}
         >
-          Possible qualities:
-          <br />
-        </strong>
-        <Dropdown
-          search
-          placeholder="Qualities"
-          multiple
-          selection
-          options={qualities}
-          value={_.map(chord.qualities, quality => JSON.stringify(quality))}
-          onChange={onChangeQualities}
-          style={{
-            minWidth: "auto",
-            minHeight: "auto",
-            width: "100%",
-            margin: 0
-          }}
-        />
-      </div>
-      <Button
-        icon
-        style={{
-          flex: 0,
-          fontSize: "1rem",
-          backgroundColor: "#f8f8f8",
-          marginRight: "0.5rem"
-        }}
-        onClick={onClickAdd}
-      >
-        <Icon name="add circle" />
-      </Button>
-      <Button
-        icon
-        style={{
-          flex: 0,
-          fontSize: "1rem",
-          backgroundColor: "#f8f8f8",
-          marginRight: "0"
-        }}
-        onClick={onClickRemove}
-      >
-        <Icon name="trash" />
-      </Button>
+          <Icon name="trash" />
+        </Button>
+      </Row>
+      <Row>
+        <p style={{ margin: "1rem 0" }}>
+          <strong>Alternative names:</strong>{" "}
+          {_.chain(
+            getChordNames(
+              _.map(
+                chord.notes,
+                ([string, fret]) => (tuning[string] + fret) % 12
+              ),
+              false
+            )
+          )
+            .map(name => {
+              return (
+                <>
+                  <a href="#">{name}</a>{" "}
+                </>
+              );
+            })
+            .value()}
+        </p>
+      </Row>
+      <Row>
+        <p>
+          <strong>Possible substitutions:</strong>{" "}
+          <a href="#" style={{ color: "#666" }}>
+            Cmaj7#5
+          </a>
+          ,{" "}
+          <a href="#" style={{ color: "#666" }}>
+            Dmaj9b5 no 1
+          </a>
+        </p>
+      </Row>
     </Wrapper>
   );
 };
