@@ -49,7 +49,7 @@ const Chart = ({
   onClick,
   sharps
 }) => {
-  let fretboardRatio = 3;
+  let fretboardRatio = 3 / 8;
   let ref = useRef();
 
   useEffect(() => {
@@ -67,8 +67,8 @@ const Chart = ({
 
     let frets = Math.max(max - min + 2, 5);
 
-    let fretHeight = fretboardFretHeight / fretboardRatio;
-    let fretWidth = fretboardFretWidth / fretboardRatio;
+    let fretHeight = fretboardFretHeight * fretboardRatio;
+    let fretWidth = fretboardFretWidth * fretboardRatio;
 
     let canvas = ref.current;
     let context = canvas.getContext("2d");
@@ -129,20 +129,6 @@ const Chart = ({
       }, {})
       .value();
 
-    let quality = _.chain(chord.notes)
-      .map(([string, fret]) => tuning[string] + fret)
-      .map(note => {
-        let interval = note - chord.root;
-        if (interval < 0) {
-          interval += 12;
-        }
-        return interval % 12;
-      })
-      .sortBy(_.identity)
-      .thru(intervals => JSON.stringify(intervals))
-      .thru(value => _.find(qualities, { value }))
-      .value();
-
     for (let fret = 0; fret < frets; fret++) {
       for (let string = 0; string < _.size(tuning); string++) {
         if (min === 0) {
@@ -182,18 +168,18 @@ const Chart = ({
     }
 
     // Draw chord name:
-    context.font = `bolder ${fretWidth}px -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif`;
+    context.font = `${fretWidth}px -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif`;
     context.textAlign = "right";
     context.textBaseline = "bottom";
     context.fillStyle = "#aaa";
     context.fillText(
-      `${noteName(chord.root, sharps)}${_.get(quality, "text", "?")}`,
+      `${noteName(chord.root, sharps)}${_.get(chord, "quality.name", "...")}`,
       width * ratio - fretWidth / 2,
       height * ratio
     );
 
     // Draw fret number:
-    context.font = `bolder ${fretWidth}px -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif`;
+    context.font = `${fretWidth}px -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif`;
     context.textAlign = "left";
     context.textBaseline = "middle";
     context.fillStyle = "#aaa";

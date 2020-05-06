@@ -75,7 +75,7 @@ const parents = [
   ["7", "1 3 5 b7"],
   /**/
   ["7b9", "1 3 5 b7 b9"],
-  ["dim7", "1 b3 b5 bb7"],
+  ["dim7", "1 b3 b5 6"],
   /**/
   ["7#9", "1 3 5 b7 #9"],
   /**/
@@ -83,7 +83,6 @@ const parents = [
   ["m7#5", "1 b3 #5 b7"], // why is this in this section?
   /**/
   ["7b5", "1 3 b5 b7"],
-  ["7b5#11", "1 3 b5 b7 #11"], // oddball?
   /**/
   ["7/6", "1 3 5 6 b7"],
   /**/
@@ -180,7 +179,6 @@ const degreeToPitch = degree => {
 const degreesToQuality = degrees => {
   return _.chain(degrees)
     .map(degreeToPitch)
-    .sortBy(_.identity)
     .thru(quality =>
       _.size(quality) !==
       _.chain(quality)
@@ -192,6 +190,11 @@ const degreesToQuality = degrees => {
     )
     .value();
 };
+
+const noteNames = sharps =>
+  sharps
+    ? ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"]
+    : ["C", "Db", "D", "Eb", "E", "F", "Gb", "G", "Ab", "A", "Bb", "B"];
 
 export const qualities = _.chain(parents)
   .flatMap(([name, formula]) => {
@@ -207,7 +210,7 @@ export const qualities = _.chain(parents)
         let updatedFormula = _.join(updatedDegrees, " ");
         let updatedName = _.trim(`${name} ${withoutString}`);
         let quality = degreesToQuality(updatedDegrees);
-        return {
+        let result = {
           name: updatedName,
           degrees: updatedDegrees,
           formula: updatedFormula,
@@ -217,13 +220,27 @@ export const qualities = _.chain(parents)
           key: JSON.stringify({ name: updatedName, formula: updatedFormula }),
           text: updatedName,
           description: updatedFormula,
-          value: JSON.stringify(quality)
+          noteNames: _.chain(updatedDegrees)
+            .map((degree, i) => {
+              let q = quality[i];
+              if (degree.includes("#")) {
+                return [q, noteNames(true)[q]];
+              } else if (degree.includes("b")) {
+                return [q, noteNames(false)[q]];
+              } else {
+                return undefined;
+              }
+            })
+            .reject(_.isUndefined)
+            .fromPairs()
+            .value()
         };
+        result.value = JSON.stringify(result);
+        return result;
       })
       .value();
   })
   .reject(({ degrees, parent, without }) => {
     return !_.isEmpty(_.difference(without, parent)) || _.size(degrees) < 3;
   })
-  .tap(console.log)
   .value();

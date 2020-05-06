@@ -99,22 +99,27 @@ const App = ({
   let [fretWidth, setFretWidth] = useState(undefined);
   let [chords, setChords] = useState(initialChords);
 
-  const onChangeRoot = (event, { value: root }) => {
-    chords.splice(selected, 1, { ...chords[selected], root, notes: [] });
-    setChords([...chords]);
-  };
-  const onChangeQualities = (event, { value: qualities }) => {
+  const onChangeRoot = (root, preserveNotes = false) => {
     chords.splice(selected, 1, {
       ...chords[selected],
-      qualities: _.map(qualities, JSON.parse),
-      notes: []
+      root,
+      notes: preserveNotes ? chords[selected].notes : []
+    });
+    setChords([...chords]);
+  };
+
+  const onChangeQuality = (quality, preserveNotes = false) => {
+    chords.splice(selected, 1, {
+      ...chords[selected],
+      quality,
+      notes: preserveNotes ? chords[selected].notes : []
     });
     setChords([...chords]);
   };
   const onClickAdd = () => {
     chords.splice(selected + 1, 0, {
       key: Math.random(),
-      qualities: [],
+      quality: undefined,
       notes: [],
       voicings: []
     });
@@ -131,7 +136,7 @@ const App = ({
         {
           key: Math.random(),
           root: null,
-          qualities: [],
+          quality: undefined,
           notes: []
         }
       ]);
@@ -211,7 +216,7 @@ const App = ({
       {
         key: Math.random(),
         root: undefined,
-        qualities: [],
+        quality: undefined,
         notes: []
       }
     ];
@@ -332,14 +337,14 @@ const App = ({
               <Form.Group>
                 <Form.Field>
                   <Radio
-                    label="Show accidentals as sharps (♯)"
+                    label="Prefer accidentals as sharps (♯) whenever possible"
                     checked={sharps}
                     onChange={() => onChangeSharps(true)}
                   />
                 </Form.Field>
                 <Form.Field>
                   <Radio
-                    label="Show accidentals as flats (♭)"
+                    label="Prefer accidentals as flats (♭) whenever possible"
                     checked={!sharps}
                     onChange={() => onChangeSharps(false)}
                   />
@@ -430,7 +435,7 @@ const App = ({
                           chord,
                           sharps,
                           onChangeRoot,
-                          onChangeQualities,
+                          onChangeQuality,
                           onClickAdd,
                           onClickRemove
                         }}

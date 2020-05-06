@@ -33,18 +33,18 @@ const Fretboard = ({
 }) => {
   let ref = useRef();
 
-  let notesInQualities = _.chain(chord.qualities)
-    .flatten()
+  let notesInQualities = _.chain(chord.quality)
+    .get("quality")
     .uniq()
     .map(note => (note + chord.root) % 12)
     .value();
 
-  let voicings = _.chain(chord.qualities)
-    .map(quality => _.map(quality, base => (base + chord.root) % 12))
-    .map(quality =>
+  let voicings = _.chain(chord.quality)
+    .get("quality")
+    .map(base => (base + chord.root) % 12)
+    .thru(quality =>
       getVoicings(quality, tuning, allowOpen, frets, maxReach, capo)
     )
-    .flatten()
     .uniqWith(_.isEqual)
     .value();
 
@@ -52,12 +52,15 @@ const Fretboard = ({
     return (tuning[string] + fret) % 12;
   };
 
-  const noteName = (string, fret, sharps, tuning) => {
-    return (sharps
-      ? ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"]
-      : ["C", "Db", "D", "Eb", "E", "F", "Gb", "G", "Ab", "A", "Bb", "B"])[
-      note(string, fret, tuning)
-    ];
+  const noteName = (string, fret, sharps, tuning, quality) => {
+    return (
+      _.get(quality, `noteNames.${(tuning[string] + fret) % 12}`) ||
+      (sharps
+        ? ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"]
+        : ["C", "Db", "D", "Eb", "E", "F", "Gb", "G", "Ab", "A", "Bb", "B"])[
+        note(string, fret, tuning)
+      ]
+    );
   };
 
   const getWidth = canvas =>
@@ -89,9 +92,9 @@ const Fretboard = ({
   let notesInChord = _.chain(chord)
     .get("notes")
     .filter(([string, fret]) => {
-      return _.chain(chord.qualities)
-        .map(quality => _.map(quality, base => (base + chord.root) % 12))
-        .flatten()
+      return _.chain(chord.quality)
+        .get("quality")
+        .map(base => (base + chord.root) % 12)
         .includes(note(string, fret, tuning))
         .value();
     })
@@ -259,7 +262,7 @@ const Fretboard = ({
           context.fill();
           context.fillStyle = "#FFF";
           context.fillText(
-            noteName(string, fret, sharps, tuning),
+            noteName(string, fret, sharps, tuning, chord.quality),
             fretsLeft + string * fretWidth,
             stringTop + fret * fretHeight + fretHeight / 2
           );
@@ -296,7 +299,7 @@ const Fretboard = ({
             context.fillStyle = "#999";
           }
           context.fillText(
-            noteName(string, fret, sharps, tuning),
+            noteName(string, fret, sharps, tuning, chord.quality),
             fretsLeft + string * fretWidth,
             stringTop + fret * fretHeight + fretHeight / 2
           );

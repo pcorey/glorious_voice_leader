@@ -49,6 +49,9 @@ export default (
   maxReach = 5,
   capo = 0
 ) => {
+  if (_.isEmpty(notes)) {
+    return [];
+  }
   let strings = _.size(tuning);
   return _.chain(notes)
     .map(findNoteOnFretboard(frets, strings, tuning, capo))
