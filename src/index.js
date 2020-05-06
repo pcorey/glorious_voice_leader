@@ -9,6 +9,7 @@ import "./index.css";
 const parse = hash => {
   let initial = {
     sharps: false,
+    allowPartialQualities: true,
     allowOpen: false,
     tuning: [40, 45, 50, 55, 59, 64],
     frets: 18,

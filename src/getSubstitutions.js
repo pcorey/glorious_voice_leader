@@ -2,7 +2,7 @@ import "lodash.combinations";
 import _ from "lodash";
 import { qualities } from "./qualities";
 
-export default (notes, quality, maxDifference = 0) => {
+export default (notes, quality, allowPartialQualities, maxDifference = 0) => {
   return _.chain(notes)
     .map(root => {
       return {
@@ -15,6 +15,7 @@ export default (notes, quality, maxDifference = 0) => {
     })
     .flatMap(({ root, notes }) => {
       return _.map(qualities)
+        .filter(quality => allowPartialQualities || _.isEmpty(quality.missing))
         .filter(({ quality, name, degrees }) => {
           return (
             _.union(_.difference(quality, notes), _.difference(notes, quality))

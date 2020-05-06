@@ -76,6 +76,7 @@ const FretSizeContext = React.createContext({ height: 0, width: 0 });
 const App = ({
   hash: {
     allowOpen: initialAllowOpen,
+    allowPartialQualities: initialAllowPartialQualities,
     sharps: initialSharps,
     tuning: initialTuning,
     chords: initialChords,
@@ -87,6 +88,9 @@ const App = ({
   let urlParams = new URLSearchParams(window.location.search);
 
   let [allowOpen, setAllowOpen] = useState(initialAllowOpen);
+  let [allowPartialQualities, setAllowPartialQualities] = useState(
+    initialAllowPartialQualities
+  );
   let [tuning, setTuning] = useState(initialTuning);
   let [settings, setSettings] = useState(false);
   let [maxReach, setMaxReach] = useState(initialMaxReach);
@@ -232,6 +236,10 @@ const App = ({
     setAllowOpen(allowOpen);
   };
 
+  const onChangeAllowPartialQualities = allowPartialQualities => {
+    setAllowPartialQualities(allowPartialQualities);
+  };
+
   const onChangeFrets = frets => {
     setFrets(frets);
   };
@@ -272,6 +280,7 @@ const App = ({
     _.chain({
       v,
       allowOpen,
+      allowPartialQualities,
       tuning,
       maxReach,
       capo,
@@ -287,6 +296,7 @@ const App = ({
       .value();
   }, [
     allowOpen,
+    allowPartialQualities,
     tuning,
     maxReach,
     capo,
@@ -347,6 +357,24 @@ const App = ({
                     label="Prefer accidentals as flats (♭) whenever possible"
                     checked={!sharps}
                     onChange={() => onChangeSharps(false)}
+                  />
+                </Form.Field>
+              </Form.Group>
+              <br />
+
+              <Form.Group>
+                <Form.Field>
+                  <Radio
+                    label={`Don't allow chord qualities with missing notes (like "maj7 no 5")`}
+                    checked={!allowPartialQualities}
+                    onChange={() => onChangeAllowPartialQualities(false)}
+                  />
+                </Form.Field>
+                <Form.Field>
+                  <Radio
+                    label={`Allow chord qualities with missing notes (like "maj7 no 5")`}
+                    checked={allowPartialQualities}
+                    onChange={() => onChangeAllowPartialQualities(true)}
                   />
                 </Form.Field>
               </Form.Group>
@@ -434,6 +462,7 @@ const App = ({
                           tuning,
                           chord,
                           sharps,
+                          allowPartialQualities,
                           onChangeRoot,
                           onChangeQuality,
                           onClickAdd,

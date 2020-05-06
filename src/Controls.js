@@ -28,35 +28,46 @@ const Link = styled.a`
   cursor: pointer;
 `;
 
-const keys = [
-  { text: "C", value: 0, key: "C" },
-  { text: "C#", value: 1, key: "C#" },
-  { text: "Db", value: 1, key: "Db" },
-  { text: "D", value: 2, key: "D" },
-  { text: "D#", value: 3, key: "D#" },
-  { text: "Eb", value: 3, key: "Eb" },
-  { text: "E", value: 4, key: "E" },
-  { text: "F", value: 5, key: "F" },
-  { text: "F#", value: 6, key: "F#" },
-  { text: "Gb", value: 6, key: "Gb" },
-  { text: "G", value: 7, key: "G" },
-  { text: "G#", value: 8, key: "G#" },
-  { text: "Ab", value: 8, key: "Ab" },
-  { text: "A", value: 9, key: "A" },
-  { text: "A#", value: 10, key: "A#" },
-  { text: "Bb", value: 10, key: "Bb" },
-  { text: "B", value: 11, key: "B" }
-];
-
 const Controls = ({
   tuning,
   chord,
   sharps,
+  allowPartialQualities,
   onChangeRoot,
   onChangeQuality,
   onClickAdd,
   onClickRemove
 }) => {
+  const keys = sharps
+    ? [
+        { text: "C", value: 0, key: "C" },
+        { text: "C#", value: 1, key: "C#" },
+        { text: "D", value: 2, key: "D" },
+        { text: "D#", value: 3, key: "D#" },
+        { text: "E", value: 4, key: "E" },
+        { text: "F", value: 5, key: "F" },
+        { text: "F#", value: 6, key: "F#" },
+        { text: "G", value: 7, key: "G" },
+        { text: "G#", value: 8, key: "G#" },
+        { text: "A", value: 9, key: "A" },
+        { text: "A#", value: 10, key: "A#" },
+        { text: "B", value: 11, key: "B" }
+      ]
+    : [
+        { text: "C", value: 0, key: "C" },
+        { text: "Db", value: 1, key: "Db" },
+        { text: "D", value: 2, key: "D" },
+        { text: "Eb", value: 3, key: "Eb" },
+        { text: "E", value: 4, key: "E" },
+        { text: "F", value: 5, key: "F" },
+        { text: "Gb", value: 6, key: "Gb" },
+        { text: "G", value: 7, key: "G" },
+        { text: "Ab", value: 8, key: "Ab" },
+        { text: "A", value: 9, key: "A" },
+        { text: "Bb", value: 10, key: "Bb" },
+        { text: "B", value: 11, key: "B" }
+      ];
+
   const noteNames = sharps
     ? ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"]
     : ["C", "Db", "D", "Eb", "E", "F", "Gb", "G", "Ab", "A", "Bb", "B"];
@@ -111,7 +122,10 @@ const Controls = ({
             search
             placeholder="Qualities"
             selection
-            options={qualities}
+            options={_.filter(
+              qualities,
+              quality => allowPartialQualities || _.isEmpty(quality.missing)
+            )}
             value={JSON.stringify(chord.quality)}
             onChange={(event, { value }) => onChangeQuality(JSON.parse(value))}
             style={{
@@ -156,7 +170,8 @@ const Controls = ({
                 chord.notes,
                 ([string, fret]) => (tuning[string] + fret) % 12
               ),
-              chord.quality
+              chord.quality,
+              allowPartialQualities
             )
           )
             .map((alternate, i, list) => {

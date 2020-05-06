@@ -201,21 +201,21 @@ export const qualities = _.chain(parents)
     let degrees = _.split(formula, /\s+/);
     return _.chain(_.range(5))
       .flatMap(i => _.combinations(["1", "3", "b3", "5"], i))
-      .map(without => {
-        let withoutString = _.chain(without)
+      .map(missing => {
+        let missingString = _.chain(missing)
           .map(degree => `no ${_.replace(degree, /#|b/, "")}`)
           .join(" ")
           .value();
-        let updatedDegrees = _.without(degrees, ...without);
+        let updatedDegrees = _.without(degrees, ...missing);
         let updatedFormula = _.join(updatedDegrees, " ");
-        let updatedName = _.trim(`${name} ${withoutString}`);
+        let updatedName = _.trim(`${name} ${missingString}`);
         let quality = degreesToQuality(updatedDegrees);
         let result = {
           name: updatedName,
           degrees: updatedDegrees,
           formula: updatedFormula,
           parent: degrees,
-          without,
+          missing,
           quality,
           key: JSON.stringify({ name: updatedName, formula: updatedFormula }),
           text: updatedName,
@@ -240,7 +240,7 @@ export const qualities = _.chain(parents)
       })
       .value();
   })
-  .reject(({ degrees, parent, without }) => {
-    return !_.isEmpty(_.difference(without, parent)) || _.size(degrees) < 3;
+  .reject(({ degrees, parent, missing }) => {
+    return !_.isEmpty(_.difference(missing, parent)) || _.size(degrees) < 3;
   })
   .value();
