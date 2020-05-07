@@ -29,16 +29,6 @@ const ArrowUp = styled.div`
   border-bottom: 1rem solid #eee;
 `;
 
-const noteName = (root, sharps) => {
-  return (
-    (sharps
-      ? ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"][root]
-      : ["C", "Db", "D", "Eb", "E", "F", "Gb", "G", "Ab", "A", "Bb", "B"][
-          root
-        ]) || ""
-  );
-};
-
 const Chart = ({
   frets,
   tuning,
@@ -173,7 +163,7 @@ const Chart = ({
     context.textBaseline = "bottom";
     context.fillStyle = "#aaa";
     context.fillText(
-      `${noteName(chord.root, sharps)}${_.get(chord, "quality.name", "...")}`,
+      `${chord.root}${_.get(chord, "quality.name", "...")}`,
       width * ratio - fretWidth / 2,
       height * ratio
     );

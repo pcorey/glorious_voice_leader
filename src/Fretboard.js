@@ -8,6 +8,7 @@ import semitoneDistance from "./semitoneDistance";
 import styled from "styled-components";
 import { useEffect } from "react";
 import { useRef } from "react";
+import { roots } from "./roots";
 
 const fretSizeRatio = 1.5;
 const lineWidth = 3;
@@ -36,12 +37,12 @@ const Fretboard = ({
   let notesInQualities = _.chain(chord.quality)
     .get("quality")
     .uniq()
-    .map(note => (note + chord.root) % 12)
+    .map(note => (note + roots[chord.root]) % 12)
     .value();
 
   let voicings = _.chain(chord.quality)
     .get("quality")
-    .map(base => (base + chord.root) % 12)
+    .map(base => (base + roots[chord.root]) % 12)
     .thru(quality =>
       getVoicings(quality, tuning, allowOpen, frets, maxReach, capo)
     )
@@ -52,15 +53,51 @@ const Fretboard = ({
     return (tuning[string] + fret) % 12;
   };
 
+  const getScale = root => {
+    let rootNote = roots[root];
+    let notes = ["C", "D", "E", "F", "G", "A", "B"];
+    let index = _.findIndex(notes, note => note === root);
+    let scale = _.chain(notes)
+      .drop(index)
+      .concat(_.take(notes, index))
+      .zip([0, 2, 4, 5, 7, 9, 11])
+      .map(([note, value]) => [note, (value + rootNote) % 12])
+      .map(([note, value]) =>
+        roots[note] === value
+          ? [note, value]
+          : roots[note] < value
+          ? [note + "#", value]
+          : [note + "b", value]
+      )
+      .value();
+    return scale;
+  };
+
+  const getModifiedScale = (root, quality) => {
+    let scale = getScale(root);
+    _.chain(quality)
+      .get("degrees")
+      .map(degree => {
+        let sharp = degree.includes("#");
+        let flat = degree.includes("b");
+        let degreeWithoutAccidental = sharp || flat ? degree.substr(1) : degree;
+        let degreeIndex = (parseInt(degreeWithoutAccidental) - 1) % 7;
+        scale[degreeIndex][0] += (sharp ? "#" : "") + (flat ? "b" : "");
+        scale[degreeIndex][1] += (sharp ? 1 : 0) + (flat ? -1 : 0);
+        scale[degreeIndex][0] = scale[degreeIndex][0].replace(/#b|b#/g, "");
+        scale[degreeIndex][1] = scale[degreeIndex][1] % 12;
+      })
+      .value();
+    return scale;
+  };
+
+  let noteNames = _.chain(getModifiedScale(chord.root, chord.quality))
+    .map(([name, value]) => [value, name])
+    .fromPairs()
+    .value();
+
   const noteName = (string, fret, sharps, tuning, quality) => {
-    return (
-      _.get(quality, `noteNames.${(tuning[string] + fret) % 12}`) ||
-      (sharps
-        ? ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"]
-        : ["C", "Db", "D", "Eb", "E", "F", "Gb", "G", "Ab", "A", "Bb", "B"])[
-        note(string, fret, tuning)
-      ]
-    );
+    return noteNames[(tuning[string] + fret) % 12];
   };
 
   const getWidth = canvas =>
@@ -94,7 +131,7 @@ const Fretboard = ({
     .filter(([string, fret]) => {
       return _.chain(chord.quality)
         .get("quality")
-        .map(base => (base + chord.root) % 12)
+        .map(base => (base + roots[chord.root]) % 12)
         .includes(note(string, fret, tuning))
         .value();
     })

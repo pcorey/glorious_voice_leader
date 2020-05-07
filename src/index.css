@@ -61,3 +61,33 @@ p strong {
 a {
     color: #6666ff;
 }
+
+
+.ui.search > .ui.input {
+    width: 100%;
+}
+
+.ui.search > .ui.input > input {
+    border: none;
+    border-radius: 4px;
+    background: #f8f8f8;
+}
+
+.ui.search .message.empty .header {
+    color: #333;
+}
+
+.ui.search .message.empty .description {
+    color: #666;
+}
+
+.ui.search .results {
+    max-height: 20.83rem;
+    overflow: auto;
+    background: #f8f8f8;
+}
+
+.ui.category.search>.results .category .result:hover, .ui.search>.results .result:hover {
+    /* background: #f0f0f0; */
+    background: #ededff;
+}

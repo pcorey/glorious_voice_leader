@@ -5,7 +5,10 @@ import styled from "styled-components";
 import { Button } from "semantic-ui-react";
 import { Dropdown } from "semantic-ui-react";
 import { Icon } from "semantic-ui-react";
+import { Search } from "semantic-ui-react";
 import { qualities } from "./qualities";
+import { roots } from "./roots";
+import { useState } from "react";
 
 const Wrapper = styled.div`
   display: flex;
@@ -28,6 +31,18 @@ const Link = styled.a`
   cursor: pointer;
 `;
 
+const resultRenderer = ({ json }) => {
+  let chord = JSON.parse(json);
+  return (
+    <div key={json}>
+      <strong>
+        {chord.root}
+        {chord.quality.name}
+      </strong>
+    </div>
+  );
+};
+
 const Controls = ({
   tuning,
   chord,
@@ -38,39 +53,55 @@ const Controls = ({
   onClickAdd,
   onClickRemove
 }) => {
-  const keys = sharps
-    ? [
-        { text: "C", value: 0, key: "C" },
-        { text: "C#", value: 1, key: "C#" },
-        { text: "D", value: 2, key: "D" },
-        { text: "D#", value: 3, key: "D#" },
-        { text: "E", value: 4, key: "E" },
-        { text: "F", value: 5, key: "F" },
-        { text: "F#", value: 6, key: "F#" },
-        { text: "G", value: 7, key: "G" },
-        { text: "G#", value: 8, key: "G#" },
-        { text: "A", value: 9, key: "A" },
-        { text: "A#", value: 10, key: "A#" },
-        { text: "B", value: 11, key: "B" }
-      ]
-    : [
-        { text: "C", value: 0, key: "C" },
-        { text: "Db", value: 1, key: "Db" },
-        { text: "D", value: 2, key: "D" },
-        { text: "Eb", value: 3, key: "Eb" },
-        { text: "E", value: 4, key: "E" },
-        { text: "F", value: 5, key: "F" },
-        { text: "Gb", value: 6, key: "Gb" },
-        { text: "G", value: 7, key: "G" },
-        { text: "Ab", value: 8, key: "Ab" },
-        { text: "A", value: 9, key: "A" },
-        { text: "Bb", value: 10, key: "Bb" },
-        { text: "B", value: 11, key: "B" }
-      ];
+  let [searchString, setSearchString] = useState(
+    chord.root && chord.quality ? `${chord.root}${chord.quality.name}` : ""
+  );
+  let [loading, setLoading] = useState(false);
 
-  const noteNames = sharps
-    ? ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"]
-    : ["C", "Db", "D", "Eb", "E", "F", "Gb", "G", "Ab", "A", "Bb", "B"];
+  const split = string => {
+    return _.reject(
+      string.match(/^[A-Z]b?#?|sus|maj|mM|m|alt|dim|b\d|#\d|\/|\d+|/g),
+      _.isEmpty
+    );
+  };
+  let inputParts = split(searchString);
+
+  const searchResults = _.chain(qualities)
+    .filter(quality => allowPartialQualities || _.isEmpty(quality.missing))
+    .flatMap(quality =>
+      _.map(Object.keys(roots), root => {
+        return {
+          root,
+          quality
+        };
+      })
+    )
+    .map(({ root, quality }) => {
+      let chordParts = split(`${root}${quality.name}`);
+      return {
+        chordParts,
+        root,
+        quality
+      };
+    })
+    .filter(({ chordParts }) => {
+      if (_.isEmpty(inputParts)) {
+        return false;
+      }
+      return _.chain(inputParts)
+        .intersection(chordParts)
+        .isEqual(inputParts)
+        .value();
+    })
+    .sortBy(({ chordParts }) => {
+      return _.size(chordParts) - _.size(inputParts);
+    })
+    .map(({ root, quality }) => {
+      return {
+        json: JSON.stringify({ root, quality })
+      };
+    })
+    .value();
 
   const onClickAlternate = alternate => event => {
     onChangeRoot(alternate.root, true);
@@ -81,59 +112,41 @@ const Controls = ({
   return (
     <Wrapper>
       <Row>
-        <div style={{ flex: 0, marginRight: "0.5rem" }}>
-          <strong
-            style={{
-              display: "block",
-              margin: "0 0.5rem 0.5rem 0",
-              textAlign: "left"
-            }}
-          >
-            Root:
-            <br />
-          </strong>
-          <Dropdown
-            search
-            placeholder="Root"
-            selection
-            options={keys}
-            value={chord.root}
-            onChange={(event, { value }) => onChangeRoot(value)}
-            style={{
-              minWidth: "auto",
-              minHeight: "auto",
-              width: "100%",
-              margin: 0
-            }}
-          />
-        </div>
         <div style={{ flex: 1, marginRight: "0.5rem" }}>
-          <strong
+          {/*<strong
             style={{
               display: "block",
               margin: "0 0.5rem 0.5rem 0",
               textAlign: "left"
             }}
           >
-            Quality:
+            Pick a chord:
             <br />
-          </strong>
-          <Dropdown
-            search
-            placeholder="Qualities"
-            selection
-            options={_.filter(
-              qualities,
-              quality => allowPartialQualities || _.isEmpty(quality.missing)
-            )}
-            value={JSON.stringify(chord.quality)}
-            onChange={(event, { value }) => onChangeQuality(JSON.parse(value))}
+          </strong>*/}
+          <Search
+            loading={loading}
+            results={searchResults}
+            fluid
+            placeholder="Search for a chord"
+            noResultsMessage="No chords found."
+            noResultsDescription="I couldn't find any chords matching the description you gave."
             style={{
               minWidth: "auto",
               minHeight: "auto",
               width: "100%",
               margin: 0
             }}
+            resultRenderer={resultRenderer}
+            onSearchChange={(event, { value }) => {
+              setSearchString(value);
+            }}
+            onResultSelect={(event, data) => {
+              let { root, quality } = JSON.parse(_.get(data, "result.json"));
+              setSearchString(`${root}${quality.name}`);
+              onChangeRoot(root);
+              onChangeQuality(quality);
+            }}
+            value={searchString}
           />
         </div>
         <Button
@@ -163,29 +176,34 @@ const Controls = ({
       </Row>
       <Row>
         <p style={{ margin: "1rem 0" }}>
-          <strong>Other names:</strong>{" "}
-          {_.chain(
-            getSubstitutions(
-              _.map(
-                chord.notes,
-                ([string, fret]) => (tuning[string] + fret) % 12
-              ),
-              chord.quality,
-              allowPartialQualities
+          <strong>Possible substitutions:</strong>{" "}
+          <ul style={{ margin: "1rem 0 0 0" }}>
+            {_.chain(
+              getSubstitutions(
+                _.map(
+                  chord.notes,
+                  ([string, fret]) => (tuning[string] + fret) % 12
+                ),
+                chord.quality,
+                allowPartialQualities,
+                sharps
+              )
             )
-          )
-            .map((alternate, i, list) => {
-              return (
-                <React.Fragment key={i}>
-                  <Link onClick={onClickAlternate(alternate)}>
-                    {noteNames[alternate.root]}
-                    {alternate.quality.name}
-                  </Link>
-                  {i !== _.size(list) - 1 ? ", " : ""}
-                </React.Fragment>
-              );
-            })
-            .value()}
+              .map((alternate, i, list) => {
+                return (
+                  <React.Fragment key={i}>
+                    <li>
+                      <Link onClick={onClickAlternate(alternate)}>
+                        {alternate.root}
+                        {alternate.quality.name}
+                      </Link>{" "}
+                      - Shares the exact same notes as your current chord.
+                    </li>
+                  </React.Fragment>
+                );
+              })
+              .value()}
+          </ul>
         </p>
       </Row>
     </Wrapper>

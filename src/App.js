@@ -365,16 +365,16 @@ const App = ({
               <Form.Group>
                 <Form.Field>
                   <Radio
-                    label={`Don't allow chord qualities with missing notes (like "maj7 no 5")`}
-                    checked={!allowPartialQualities}
-                    onChange={() => onChangeAllowPartialQualities(false)}
+                    label={`Allow chord qualities with missing notes (like "maj7 no 5")`}
+                    checked={allowPartialQualities}
+                    onChange={() => onChangeAllowPartialQualities(true)}
                   />
                 </Form.Field>
                 <Form.Field>
                   <Radio
-                    label={`Allow chord qualities with missing notes (like "maj7 no 5")`}
-                    checked={allowPartialQualities}
-                    onChange={() => onChangeAllowPartialQualities(true)}
+                    label={`Don't allow chord qualities with missing notes (like "maj7 no 5")`}
+                    checked={!allowPartialQualities}
+                    onChange={() => onChangeAllowPartialQualities(false)}
                   />
                 </Form.Field>
               </Form.Group>
@@ -383,16 +383,16 @@ const App = ({
               <Form.Group>
                 <Form.Field>
                   <Radio
-                    label="Don't allow open strings in higher voicings"
-                    checked={!allowOpen}
-                    onChange={() => onChangeAllowOpen(false)}
+                    label="Allow open strings in higher voicings"
+                    checked={allowOpen}
+                    onChange={() => onChangeAllowOpen(true)}
                   />
                 </Form.Field>
                 <Form.Field>
                   <Radio
-                    label="Allow open strings in higher voicings"
-                    checked={allowOpen}
-                    onChange={() => onChangeAllowOpen(true)}
+                    label="Don't allow open strings in higher voicings"
+                    checked={!allowOpen}
+                    onChange={() => onChangeAllowOpen(false)}
                   />
                 </Form.Field>
               </Form.Group>

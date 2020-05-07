@@ -2,13 +2,36 @@ import "lodash.combinations";
 import _ from "lodash";
 import { qualities } from "./qualities";
 
-export default (notes, quality, allowPartialQualities, maxDifference = 0) => {
+export default (
+  notes,
+  quality,
+  allowPartialQualities,
+  sharps,
+  maxDifference = 0
+) => {
   return _.chain(notes)
-    .map(root => {
+    .map(note => {
       return {
-        root,
+        root:
+          _.get(quality, `noteNames.${note}`) ||
+          (sharps
+            ? ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"]
+            : [
+                "C",
+                "Db",
+                "D",
+                "Eb",
+                "E",
+                "F",
+                "Gb",
+                "G",
+                "Ab",
+                "A",
+                "Bb",
+                "B"
+              ])[note],
         notes: _.chain(notes)
-          .map(note => (note + 12 - root) % 12)
+          .map(n => (n + 12 - note) % 12)
           .sortBy(_.identity)
           .value()
       };
