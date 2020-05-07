@@ -97,7 +97,12 @@ const Fretboard = ({
     .value();
 
   const noteName = (string, fret, sharps, tuning, quality) => {
-    return noteNames[(tuning[string] + fret) % 12];
+    let index = (tuning[string] + fret) % 12;
+    return noteNames[index]
+      ? noteNames[index]
+      : noteNames[(index + 1) % 12]
+      ? (noteNames[(index + 1) % 12] + "b").replace(/#b|b#/g, "")
+      : (noteNames[(index - 1 + 12) % 12] + "#").replace(/#b|b#/g, "");
   };
 
   const getWidth = canvas =>
