@@ -346,7 +346,7 @@ const App = ({
               />
               <br />
               <br />
-              <Form.Group>
+              {/*<Form.Group>
                 <Form.Field>
                   <Radio
                     label="Prefer accidentals as sharps (♯) whenever possible"
@@ -362,7 +362,7 @@ const App = ({
                   />
                 </Form.Field>
               </Form.Group>
-              <br />
+              <br />*/}
 
               <Form.Group>
                 <Form.Field>
