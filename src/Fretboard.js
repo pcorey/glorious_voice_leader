@@ -40,14 +40,24 @@ const Fretboard = ({
     .map(note => (note + roots[chord.root]) % 12)
     .value();
 
+  console.time("Time to generate voicings");
   let voicings = _.chain(chord.quality)
     .get("quality")
     .map(base => (base + roots[chord.root]) % 12)
     .thru(quality =>
-      getVoicings(quality, tuning, allowOpen, frets, maxReach, capo)
+      getVoicings(
+        quality,
+        chord.notes,
+        tuning,
+        allowOpen,
+        frets,
+        maxReach,
+        capo
+      )
     )
     .uniqWith(_.isEqual)
     .value();
+  console.timeEnd("Time to generate voicings");
 
   const note = (string, fret, tuning) => {
     return (tuning[string] + fret) % 12;
@@ -151,6 +161,7 @@ const Fretboard = ({
     );
   });
 
+  console.time("Time to generate heatmap");
   let heatmap = _.chain(voicings)
     .thru(voicings =>
       getHeatmap(voicings, (previous, { i, voicing }) => {
@@ -185,6 +196,7 @@ const Fretboard = ({
         : 0;
     })
     .value();
+  console.timeEnd("Time to generate heatmap");
 
   useEffect(() => {
     let canvas = ref.current;

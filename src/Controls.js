@@ -3,7 +3,6 @@ import _ from "lodash";
 import getSubstitutions from "./getSubstitutions.js";
 import styled from "styled-components";
 import { Button } from "semantic-ui-react";
-import { Dropdown } from "semantic-ui-react";
 import { Icon } from "semantic-ui-react";
 import { Search } from "semantic-ui-react";
 import { qualities } from "./qualities";
@@ -34,11 +33,12 @@ const Link = styled.a`
 const resultRenderer = ({ json }) => {
   let chord = JSON.parse(json);
   return (
-    <div key={json}>
-      <strong>
+    <div key={json} style={{ display: "flex" }}>
+      <strong style={{ flex: "1", color: "#333" }}>
         {chord.root}
         {chord.quality.name}
       </strong>
+      <span style={{ color: "#666" }}>{chord.quality.formula}</span>
     </div>
   );
 };
@@ -105,7 +105,7 @@ const Controls = ({
 
   const onClickAlternate = alternate => event => {
     onChangeRoot(alternate.root, true);
-    onChangeQuality(_.omit(alternate.quality, "value"), true);
+    onChangeQuality(alternate.quality, true);
     return false;
   };
 
@@ -113,23 +113,15 @@ const Controls = ({
     <Wrapper>
       <Row>
         <div style={{ flex: 1, marginRight: "0.5rem" }}>
-          {/*<strong
-            style={{
-              display: "block",
-              margin: "0 0.5rem 0.5rem 0",
-              textAlign: "left"
-            }}
-          >
-            Pick a chord:
-            <br />
-          </strong>*/}
           <Search
             loading={loading}
             results={searchResults}
             fluid
             placeholder="Search for a chord"
-            noResultsMessage="No chords found."
-            noResultsDescription="I couldn't find any chords matching the description you gave."
+            noResultsMessage="I couldn't find any chords like that."
+            noResultsDescription={
+              'Roots should be capitalized, like "Cmaj7". Extensions and alterations can come in any order, like "7#5b9" or "7b9#5". If you still can\'t find what you\'re looking for, just ask for it!'
+            }
             style={{
               minWidth: "auto",
               minHeight: "auto",
@@ -174,7 +166,7 @@ const Controls = ({
           <Icon name="trash" />
         </Button>
       </Row>
-      <Row>
+      {/* <Row>
         <p style={{ margin: "1rem 0" }}>
           <strong>Possible substitutions:</strong>{" "}
           <ul style={{ margin: "1rem 0 0 0" }}>
@@ -205,7 +197,7 @@ const Controls = ({
               .value()}
           </ul>
         </p>
-      </Row>
+      </Row> */}
     </Wrapper>
   );
 };

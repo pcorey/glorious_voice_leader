@@ -106,6 +106,7 @@ const App = ({
   const onChangeRoot = (root, preserveNotes = false) => {
     chords.splice(selected, 1, {
       ...chords[selected],
+      key: Math.random(),
       root,
       notes: preserveNotes ? chords[selected].notes : []
     });
@@ -115,6 +116,7 @@ const App = ({
   const onChangeQuality = (quality, preserveNotes = false) => {
     chords.splice(selected, 1, {
       ...chords[selected],
+      key: Math.random(),
       quality,
       notes: preserveNotes ? chords[selected].notes : []
     });
@@ -260,23 +262,23 @@ const App = ({
   }, [selected, chords]);
 
   useEffect(() => {
-    _.chain(chords)
-      .map(chord => {
-        let notes = [];
-        for (let i = 0; i < chord.notes.length; i++) {
-          notes.push(tuning[chord.notes[i][0]] + chord.notes[i][1]);
-        }
-        return notes;
-      })
-      .thru(chords => {
-        let text = _.chain(chords)
-          .thru(chords => _.zip(...chords))
-          .map(group => _.join(group, " "))
-          .join("\\\n         \\")
-          .value();
-        console.log(`chords = "${text}"`);
-      })
-      .value();
+    // _.chain(chords)
+    //   .map(chord => {
+    //     let notes = [];
+    //     for (let i = 0; i < chord.notes.length; i++) {
+    //       notes.push(tuning[chord.notes[i][0]] + chord.notes[i][1]);
+    //     }
+    //     return notes;
+    //   })
+    //   .thru(chords => {
+    //     let text = _.chain(chords)
+    //       .thru(chords => _.zip(...chords))
+    //       .map(group => _.join(group, " "))
+    //       .join("\\\n         \\")
+    //       .value();
+    //     console.log(`chords = "${text}"`);
+    //   })
+    //   .value();
     _.chain({
       v,
       allowOpen,
@@ -496,7 +498,8 @@ const App = ({
             opinions on chords and chord progressions, I highly recommend you
             pick up Ted Greene's{" "}
             <a href="https://amzn.to/2YQ8xYM">Chord Chemistry</a> and{" "}
-            <a href="https://amzn.to/2YWgKur">Modern Chord Progressions</a>.
+            <a href="https://amzn.to/2YWgKur">Modern Chord Progressions</a>, or
+            Joe Pass' <a href="https://amzn.to/2YNsYcG">Guitar Style</a>.
           </p>
           <p>
             <em>

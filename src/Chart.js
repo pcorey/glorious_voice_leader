@@ -163,7 +163,7 @@ const Chart = ({
     context.textBaseline = "bottom";
     context.fillStyle = "#aaa";
     context.fillText(
-      `${chord.root}${_.get(chord, "quality.name", "...")}`,
+      `${chord.root || ""}${_.get(chord, "quality.name", "...")}`,
       width * ratio - fretWidth / 2,
       height * ratio
     );

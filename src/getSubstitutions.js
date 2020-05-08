@@ -55,7 +55,7 @@ export default (
     .reject(result => {
       return _.chain(result.quality)
         .omit("value")
-        .isEqual(quality)
+        .isEqual(_.omit(quality, "value"))
         .value();
     })
     .reject(({ quality }) => _.isUndefined(quality))
