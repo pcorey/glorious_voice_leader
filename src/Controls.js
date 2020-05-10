@@ -109,6 +109,13 @@ const Controls = ({
     return false;
   };
 
+  let possibleSubstitutions = getSubstitutions(
+    _.map(chord.notes, ([string, fret]) => (tuning[string] + fret) % 12),
+    chord.quality,
+    allowPartialQualities,
+    sharps
+  );
+
   return (
     <Wrapper>
       <Row>
@@ -166,38 +173,30 @@ const Controls = ({
           <Icon name="trash" />
         </Button>
       </Row>
-      {/* <Row>
-        <p style={{ margin: "1rem 0" }}>
-          <strong>Possible substitutions:</strong>{" "}
-          <ul style={{ margin: "1rem 0 0 0" }}>
-            {_.chain(
-              getSubstitutions(
-                _.map(
-                  chord.notes,
-                  ([string, fret]) => (tuning[string] + fret) % 12
-                ),
-                chord.quality,
-                allowPartialQualities,
-                sharps
-              )
-            )
-              .map((alternate, i, list) => {
-                return (
-                  <React.Fragment key={i}>
-                    <li>
-                      <Link onClick={onClickAlternate(alternate)}>
-                        {alternate.root}
-                        {alternate.quality.name}
-                      </Link>{" "}
-                      - Shares the exact same notes as your current chord.
-                    </li>
-                  </React.Fragment>
-                );
-              })
-              .value()}
-          </ul>
-        </p>
-      </Row> */}
+      {!_.isEmpty(possibleSubstitutions) && (
+        <Row>
+          <p style={{ margin: "1rem 0" }}>
+            <strong>Possible substitutions:</strong>{" "}
+            <ul style={{ margin: "1rem 0 0 0" }}>
+              {_.chain(possibleSubstitutions)
+                .map((alternate, i, list) => {
+                  return (
+                    <React.Fragment key={i}>
+                      <li>
+                        <Link onClick={onClickAlternate(alternate)}>
+                          {alternate.root}
+                          {alternate.quality.name}
+                        </Link>{" "}
+                        - Shares the exact same notes as your current chord.
+                      </li>
+                    </React.Fragment>
+                  );
+                })
+                .value()}
+            </ul>
+          </p>
+        </Row>
+      )}
     </Wrapper>
   );
 };

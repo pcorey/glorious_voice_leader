@@ -6,9 +6,11 @@ import getPixelRatio from "./getPixelRatio";
 import getVoicings from "./voicings";
 import semitoneDistance from "./semitoneDistance";
 import styled from "styled-components";
+import { degreeToPitch } from "./qualities";
+import { possibleDegrees } from "./qualities";
+import { roots } from "./roots";
 import { useEffect } from "react";
 import { useRef } from "react";
-import { roots } from "./roots";
 
 const fretSizeRatio = 1.5;
 const lineWidth = 3;
@@ -63,6 +65,82 @@ const Fretboard = ({
     return (tuning[string] + fret) % 12;
   };
 
+  // // http://musictheory.pugetsound.edu/mt21c/HowToDetermineChord-ScaleRelationships.html
+  // const getChordScale = (root, quality) => {
+  //   let notes = ["C", "D", "E", "F", "G", "A", "B"];
+  //   let index = _.findIndex(notes, note => note === root);
+  //   let scale = _.chain(quality)
+  //     .get("degrees")
+  //     .map(degree => {
+  //       return degree
+  //         .replace("9", "2")
+  //         .replace("11", "4")
+  //         .replace("13", "6");
+  //     })
+  //     .sortBy(degree => parseInt(_.replace(degree, /#|b/, "")))
+  //     .thru(degrees => {
+  //       let missing = _.chain(possibleDegrees)
+  //         .keys()
+  //         .difference(_.map(degrees, degree => _.replace(degree, /#|b/, "")))
+  //         .map(degree => possibleDegrees[degree])
+  //         .value();
+  //       return _.chain([degrees])
+  //         .product(...missing)
+  //         .map(_.flatten)
+  //         .map(degrees =>
+  //           _.sortBy(degrees, degree => parseInt(_.replace(degree, /#|b/, "")))
+  //         )
+  //         .value();
+  //     })
+  //     .reject(degrees => {
+  //       let pitches = _.map(degrees, degreeToPitch);
+  //       let differences = _.reduce(
+  //         pitches,
+  //         (differences, pitch, i) => {
+  //           if (_.isUndefined(differences)) {
+  //             return [];
+  //           }
+  //           differences.push(pitch - pitches[i - 1]);
+  //           return differences;
+  //         },
+  //         undefined
+  //       );
+  //       let hasDuplicatePitches = _.size(_.uniq(pitches)) !== _.size(pitches);
+  //       let hasAugmentedSecond = _.find(differences, interval => interval > 2);
+  //       let hasConsecutiveHalfSteps = _.join(pitches, ",").includes("1,1");
+  //       return (
+  //         hasDuplicatePitches || hasAugmentedSecond || hasConsecutiveHalfSteps
+  //       );
+  //     })
+  //     .sortBy(degrees =>
+  //       _.chain(degrees)
+  //         .map(degree => (degree.includes("#") || degree.includes("b") ? 1 : 0))
+  //         .sum()
+  //         .value()
+  //     )
+  //     .tap(scales =>
+  //       console.log(
+  //         `Generated ${_.size(scales)} possible chord scales. Using ${_.chain(
+  //           scales
+  //         )
+  //           .first()
+  //           .join(" ")
+  //           .value()}.`,
+  //         scales
+  //       )
+  //     )
+  //     .first()
+  //     .value();
+  //   return _.chain(notes)
+  //     .drop(index)
+  //     .concat(_.take(notes, index))
+  //     .zip(scale)
+  //     .map(([note, degree]) => note + _.replace(degree, /\d+/, ""))
+  //     .value();
+  // };
+
+  // console.log(getChordScale("C", { degrees: ["1", "3", "7", "9", "#11"] }));
+
   const getScale = root => {
     let rootNote = roots[root];
     let notes = ["C", "D", "E", "F", "G", "A", "B"];
@@ -107,6 +185,13 @@ const Fretboard = ({
     .value();
 
   const noteName = (string, fret, sharps, tuning, quality) => {
+    if (!quality) {
+      return (sharps
+        ? ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"]
+        : ["C", "Db", "D", "Eb", "E", "F", "Gb", "G", "Ab", "A", "Bb", "B"])[
+        (tuning[string] + fret) % 12
+      ];
+    }
     let index = (tuning[string] + fret) % 12;
     return noteNames[index]
       ? noteNames[index]

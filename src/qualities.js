@@ -134,7 +134,17 @@ const parents = [
   ["7/#11", "(1) 3 (5) b7 #11"]
 ];
 
-const degreeToPitch = degree => {
+export const possibleDegrees = {
+  "1": ["1"],
+  "2": ["b2", "2", "#2"],
+  "3": ["b3", "3"],
+  "4": ["4", "#4"],
+  "5": ["b5", "5", "#5"],
+  "6": ["b6", "6"],
+  "7": ["b7", "7"]
+};
+
+export const degreeToPitch = degree => {
   switch (degree) {
     case "1":
       return 0;
