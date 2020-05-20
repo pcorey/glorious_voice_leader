@@ -47,7 +47,8 @@ export default (
   allowOpen,
   frets = 18,
   maxReach = 5,
-  capo = 0
+  min = 0,
+  max = frets
 ) => {
   if (_.isEmpty(notes)) {
     return [];
@@ -58,19 +59,19 @@ export default (
     .thru(_.last)
     .defaultTo(0)
     .subtract(maxReach)
-    .thru(fret => _.max([fret, capo]))
+    .thru(fret => _.max([fret, min]))
     .value();
   let maxCapo = _.chain(notesInChord)
     .minBy(_.last)
     .thru(_.last)
     .defaultTo(frets)
     .add(maxReach)
-    .thru(fret => _.min([fret, frets]))
+    .thru(fret => _.min([fret, max]))
     .value();
   return _.chain(notes)
     .map(findNoteOnFretboard(frets, strings, tuning, minCapo, maxCapo))
     .thru(notesOnFretboard => _.product.apply(null, notesOnFretboard))
     .reject(hasDoubledStrings)
-    .reject(hasUnplayableStretch(maxReach, allowOpen, capo))
+    .reject(hasUnplayableStretch(maxReach, allowOpen, min))
     .value();
 };

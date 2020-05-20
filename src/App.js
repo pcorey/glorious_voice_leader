@@ -122,6 +122,17 @@ const App = ({
     });
     setChords([...chords]);
   };
+
+  const onClickChord = ({ root, quality }, previousSubstitutions) => {
+    chords.splice(selected, 1, {
+      ...chords[selected],
+      key: Math.random(),
+      previousSubstitutions
+    });
+    onChangeRoot(root);
+    onChangeQuality(quality);
+  };
+
   const onClickAdd = () => {
     chords.splice(selected + 1, 0, {
       key: Math.random(),
@@ -132,6 +143,7 @@ const App = ({
     setChords([...chords]);
     setSelected(selected + 1);
   };
+
   const onClickRemove = () => {
     if (_.size(chords) > 1) {
       chords.splice(selected, 1);
@@ -465,10 +477,17 @@ const App = ({
                           chord,
                           sharps,
                           allowPartialQualities,
+                          previousChord:
+                            selected > 0 ? chords[selected - 1] : undefined,
+                          nextChord:
+                            selected < _.size(chords) - 1
+                              ? chords[selected + 1]
+                              : undefined,
                           onChangeRoot,
                           onChangeQuality,
                           onClickAdd,
-                          onClickRemove
+                          onClickRemove,
+                          onClickChord
                         }}
                       />
                     )}

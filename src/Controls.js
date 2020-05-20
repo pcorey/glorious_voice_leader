@@ -1,6 +1,7 @@
 import React from "react";
 import _ from "lodash";
 import getSubstitutions from "./getSubstitutions.js";
+import semitoneDistance from "./semitoneDistance";
 import styled from "styled-components";
 import { Button } from "semantic-ui-react";
 import { Icon } from "semantic-ui-react";
@@ -48,10 +49,13 @@ const Controls = ({
   chord,
   sharps,
   allowPartialQualities,
-  onChangeRoot,
-  onChangeQuality,
+  previousChord,
+  nextChord,
+  // onChangeRoot,
+  // onChangeQuality,
   onClickAdd,
-  onClickRemove
+  onClickRemove,
+  onClickChord
 }) => {
   let [searchString, setSearchString] = useState(
     chord.root && chord.quality ? `${chord.root}${chord.quality.name}` : ""
@@ -104,17 +108,83 @@ const Controls = ({
     .value();
 
   const onClickAlternate = alternate => event => {
-    onChangeRoot(alternate.root, true);
-    onChangeQuality(alternate.quality, true);
+    onClickChord(alternate, [
+      {
+        root: chord.root,
+        quality: chord.quality,
+        name: chord.quality.name
+      },
+      ...chord.previousSubstitutions
+    ]);
     return false;
   };
 
   let possibleSubstitutions = getSubstitutions(
-    _.map(chord.notes, ([string, fret]) => (tuning[string] + fret) % 12),
+    chord.notes,
+    tuning,
+    chord.root,
     chord.quality,
     allowPartialQualities,
-    sharps
+    sharps,
+    previousChord,
+    nextChord
   );
+
+  const Substitution = ({ substitution }) => {
+    let [open, setOpen] = useState(false);
+    return (
+      <div
+        style={{
+          backgroundColor: "#fff",
+          margin: "1rem 0 0 0",
+          padding: "1rem"
+        }}
+        key={JSON.stringify({
+          root: substitution.root,
+          quality: substitution.quality
+        })}
+      >
+        <div style={{ display: "flex" }}>
+          <Link onClick={onClickAlternate(substitution)}>
+            {substitution.root}
+            {substitution.quality.name}
+          </Link>
+          <div style={{ flex: "1", textAlign: "right" }}>
+            <Icon
+              name="question"
+              style={{
+                marginRight: "1rem",
+                color: open ? "#666" : "#eee",
+                cursor: "pointer"
+              }}
+              onClick={() => setOpen(!open)}
+            />
+          </div>
+          <span
+            style={{
+              padding: "0.25rem 0.5rem",
+              margin: "-0.25rem -0.5rem",
+              backgroundColor: `rgba(0,0,255,${Math.atan(
+                substitution.score * 0.25
+              ) /
+                (Math.PI / 2) /
+                2})`
+            }}
+          >
+            {substitution.score === 0
+              ? `±0`
+              : substitution.score >= 0
+              ? `+${Math.abs(substitution.score)}`
+              : `-${Math.abs(substitution.score)}`}
+          </span>
+        </div>
+        {open &&
+          _.map(substitution.substitutions, substitution => (
+            <div style={{ margin: "1rem" }}>{substitution.description}</div>
+          ))}
+      </div>
+    );
+  };
 
   return (
     <Wrapper>
@@ -142,8 +212,7 @@ const Controls = ({
             onResultSelect={(event, data) => {
               let { root, quality } = JSON.parse(_.get(data, "result.json"));
               setSearchString(`${root}${quality.name}`);
-              onChangeRoot(root);
-              onChangeQuality(quality);
+              onClickChord({ root, quality }, []);
             }}
             value={searchString}
           />
@@ -173,27 +242,50 @@ const Controls = ({
           <Icon name="trash" />
         </Button>
       </Row>
-      {!_.isEmpty(possibleSubstitutions) && (
+      {!_.isEmpty(chord.previousSubstitutions) && (
         <Row>
-          <p style={{ margin: "1rem 0" }}>
-            <strong>Possible substitutions:</strong>{" "}
-            <ul style={{ margin: "1rem 0 0 0" }}>
-              {_.chain(possibleSubstitutions)
+          <p style={{ margin: "0 0 -1rem 0", width: "100%" }}>
+            <div style={{ margin: "1rem 0" }}>
+              {_.chain(chord.previousSubstitutions)
                 .map((alternate, i, list) => {
                   return (
                     <React.Fragment key={i}>
-                      <li>
-                        <Link onClick={onClickAlternate(alternate)}>
-                          {alternate.root}
-                          {alternate.quality.name}
-                        </Link>{" "}
-                        - Shares the exact same notes as your current chord.
-                      </li>
+                      {i === 0 ? (
+                        <Icon name="arrow up" style={{ margin: "0 0.5rem" }} />
+                      ) : (
+                        <Icon
+                          name="arrow left"
+                          style={{ margin: "0 0.5rem" }}
+                        />
+                      )}
+                      <Link
+                        onClick={() => {
+                          onClickChord(
+                            alternate,
+                            chord.previousSubstitutions.slice(i + 1)
+                          );
+                        }}
+                      >
+                        {alternate.root}
+                        {alternate.quality.name}
+                      </Link>
                     </React.Fragment>
                   );
                 })
                 .value()}
-            </ul>
+            </div>
+          </p>
+        </Row>
+      )}
+      {!_.isEmpty(possibleSubstitutions) && (
+        <Row>
+          <p style={{ margin: "1rem 0 0", width: "100%" }}>
+            <strong>Possible substitutions:</strong>{" "}
+            {_.chain(possibleSubstitutions)
+              .map((alternate, i, list) => {
+                return <Substitution substitution={alternate} />;
+              })
+              .value()}
           </p>
         </Row>
       )}

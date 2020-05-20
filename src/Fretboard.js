@@ -65,124 +65,63 @@ const Fretboard = ({
     return (tuning[string] + fret) % 12;
   };
 
-  // // http://musictheory.pugetsound.edu/mt21c/HowToDetermineChord-ScaleRelationships.html
-  // const getChordScale = (root, quality) => {
-  //   let notes = ["C", "D", "E", "F", "G", "A", "B"];
-  //   let index = _.findIndex(notes, note => note === root);
-  //   let scale = _.chain(quality)
-  //     .get("degrees")
-  //     .map(degree => {
-  //       return degree
-  //         .replace("9", "2")
-  //         .replace("11", "4")
-  //         .replace("13", "6");
-  //     })
-  //     .sortBy(degree => parseInt(_.replace(degree, /#|b/, "")))
-  //     .thru(degrees => {
-  //       let missing = _.chain(possibleDegrees)
-  //         .keys()
-  //         .difference(_.map(degrees, degree => _.replace(degree, /#|b/, "")))
-  //         .map(degree => possibleDegrees[degree])
-  //         .value();
-  //       return _.chain([degrees])
-  //         .product(...missing)
-  //         .map(_.flatten)
-  //         .map(degrees =>
-  //           _.sortBy(degrees, degree => parseInt(_.replace(degree, /#|b/, "")))
-  //         )
-  //         .value();
-  //     })
-  //     .reject(degrees => {
-  //       let pitches = _.map(degrees, degreeToPitch);
-  //       let differences = _.reduce(
-  //         pitches,
-  //         (differences, pitch, i) => {
-  //           if (_.isUndefined(differences)) {
-  //             return [];
-  //           }
-  //           differences.push(pitch - pitches[i - 1]);
-  //           return differences;
-  //         },
-  //         undefined
-  //       );
-  //       let hasDuplicatePitches = _.size(_.uniq(pitches)) !== _.size(pitches);
-  //       let hasAugmentedSecond = _.find(differences, interval => interval > 2);
-  //       let hasConsecutiveHalfSteps = _.join(pitches, ",").includes("1,1");
-  //       return (
-  //         hasDuplicatePitches || hasAugmentedSecond || hasConsecutiveHalfSteps
-  //       );
-  //     })
-  //     .sortBy(degrees =>
-  //       _.chain(degrees)
-  //         .map(degree => (degree.includes("#") || degree.includes("b") ? 1 : 0))
-  //         .sum()
-  //         .value()
-  //     )
-  //     .tap(scales =>
-  //       console.log(
-  //         `Generated ${_.size(scales)} possible chord scales. Using ${_.chain(
-  //           scales
-  //         )
-  //           .first()
-  //           .join(" ")
-  //           .value()}.`,
-  //         scales
-  //       )
-  //     )
-  //     .first()
-  //     .value();
-  //   return _.chain(notes)
-  //     .drop(index)
-  //     .concat(_.take(notes, index))
-  //     .zip(scale)
-  //     .map(([note, degree]) => note + _.replace(degree, /\d+/, ""))
-  //     .value();
-  // };
+  const getNoteNames = (root, quality) => {
+    let notes =
+      (root && root.includes("#")) || sharps
+        ? ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"]
+        : ["C", "Db", "D", "Eb", "E", "F", "Gb", "G", "Ab", "A", "Bb", "B"];
 
-  // console.log(getChordScale("C", { degrees: ["1", "3", "7", "9", "#11"] }));
-
-  const getScale = root => {
-    let rootNote = roots[root];
-    let notes = ["C", "D", "E", "F", "G", "A", "B"];
-    let index = _.findIndex(notes, note => note === root);
-    let scale = _.chain(notes)
-      .drop(index)
-      .concat(_.take(notes, index))
-      .zip([0, 2, 4, 5, 7, 9, 11])
-      .map(([note, value]) => [note, (value + rootNote) % 12])
-      .map(([note, value]) =>
-        roots[note] === value
-          ? [note, value]
-          : roots[note] < value
-          ? [note + "#", value]
-          : [note + "b", value]
-      )
+    let letterIndex = _.findIndex(
+      ["C", "D", "E", "F", "G", "A", "B"],
+      letter => root && letter === root.substr(0, 1)
+    );
+    let letters = _.chain(["C", "D", "E", "F", "G", "A", "B"])
+      .drop(letterIndex)
+      .concat(_.take(["C", "D", "E", "F", "G", "A", "B"], letterIndex))
       .value();
-    return scale;
-  };
+    let scale = _.chain([0, 2, 4, 5, 7, 9, 11])
+      .map(note => (note + roots[root]) % 12)
+      .map((note, i) => {
+        let letter = letters[i];
+        let target = notes[note];
+        let diff = Math.min(
+          Math.abs(roots[target] - roots[letter]),
+          Math.abs(roots[target] - roots[letter] + 12)
+        );
+        return (
+          letter +
+          _.chain(diff)
+            .range()
+            .map(_ => {
+              if (diff === Math.abs(roots[target] - root[letter])) {
+                return "b";
+              } else {
+                return "#";
+              }
+            })
+            .join("")
+            .value()
+        );
+      })
+      .value();
 
-  const getModifiedScale = (root, quality) => {
-    let scale = getScale(root);
     _.chain(quality)
       .get("degrees")
       .map(degree => {
-        let sharp = degree.includes("#");
-        let flat = degree.includes("b");
-        let degreeWithoutAccidental = sharp || flat ? degree.substr(1) : degree;
-        let degreeIndex = (parseInt(degreeWithoutAccidental) - 1) % 7;
-        scale[degreeIndex][0] += (sharp ? "#" : "") + (flat ? "b" : "");
-        scale[degreeIndex][1] += (sharp ? 1 : 0) + (flat ? -1 : 0);
-        scale[degreeIndex][0] = scale[degreeIndex][0].replace(/#b|b#/g, "");
-        scale[degreeIndex][1] = scale[degreeIndex][1] % 12;
+        let offset = parseInt(_.replace(degree, /#|b/, "")) - 1;
+        let accidental = _.replace(degree, /[^#b]+/, "");
+        let letter = scale[offset % _.size(scale)];
+        notes[(degreeToPitch(degree) + roots[root]) % 12] = _.replace(
+          `${letter}${accidental}`,
+          /#b|b#/,
+          ""
+        );
       })
       .value();
-    return scale;
+    return notes;
   };
 
-  let noteNames = _.chain(getModifiedScale(chord.root, chord.quality))
-    .map(([name, value]) => [value, name])
-    .fromPairs()
-    .value();
+  let noteNames = getNoteNames(chord.root, chord.quality);
 
   const noteName = (string, fret, sharps, tuning, quality) => {
     if (!quality) {

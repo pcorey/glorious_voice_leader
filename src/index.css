@@ -91,3 +91,18 @@ a {
     /* background: #f0f0f0; */
     background: #ededff;
 }
+
+
+blockquote {
+    margin: 0;
+    border-left: 2px solid #ddd;
+    padding-left: 1rem;
+}
+
+blockquote footer {
+    color: #ddd;
+}
+
+blockquote ol {
+    margin: 0;
+}

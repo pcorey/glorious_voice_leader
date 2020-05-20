@@ -1,15 +1,20 @@
 import "lodash.combinations";
 import _ from "lodash";
 
-const parents = [
+_.chain(_.range(3, 12 + 1))
+  .flatMap(k => _.combinations(["1", "3", "5", "7", "9", "11", "13"], k))
+  .size()
+  .value();
+
+const baseQualities = [
   /**/
   ["maj", "1 3 5"],
   /**/
-  ["maj6", "1 3 (5) 6"],
+  ["6", "1 3 (5) 6"],
   /**/
   ["maj/9", "1 3 (5) 9"],
   /**/
-  ["maj6/9", "(1) 3 (5) 6 9"],
+  ["6/9", "(1) 3 (5) 6 9"],
   /**/
   ["sus4", "1 4 5"],
   ["sus2", "1 2 5"],
@@ -33,10 +38,10 @@ const parents = [
   ["sus2/#11", "(1) 2 5 #11"],
   ["/9#11", "(1) 3 (5) 9 #11"],
   ["maj7/6#11", "(1) 3 (5) 6 7 #11"],
-  ["maj6/9#11", "(1) 3 (5) 6 9 #11"],
-  ["maj6/b9#11", "(1) 3 (5) 6 b9 #11"],
+  ["6/9#11", "(1) 3 (5) 6 9 #11"],
+  ["6/b9#11", "(1) 3 (5) 6 b9 #11"],
   ["maj7/6#9b5", "(1) 3 b5 6 7 #9"],
-  ["maj6/#11", "(1) 3 (5) 6 #11"],
+  ["6/#11", "(1) 3 (5) 6 #11"],
   /**/
   ["m", "1 b3 5"],
   /**/
@@ -131,7 +136,9 @@ const parents = [
   /**/
   ["aug", "1 3 #5"],
   /**/
-  ["7/#11", "(1) 3 (5) b7 #11"]
+  ["7/#11", "(1) 3 (5) b7 #11"],
+  /**/
+  ["dim", "1 b3 b5"]
 ];
 
 export const possibleDegrees = {
@@ -200,19 +207,14 @@ const degreesToQuality = degrees => {
     .value();
 };
 
-const noteNames = sharps =>
-  sharps
-    ? ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"]
-    : ["C", "Db", "D", "Eb", "E", "F", "Gb", "G", "Ab", "A", "Bb", "B"];
-
-export const qualities = _.chain(parents)
+export const qualities = _.chain(baseQualities)
   .flatMap(([name, formula]) => {
-    let allDegrees = _.split(formula, /\s+/);
     let degrees = _.chain(formula)
       .split(/\s+/)
       .map(degree => _.trim(degree, "()"))
       .value();
-    let optionals = _.chain(allDegrees)
+    let optionals = _.chain(formula)
+      .split(/\s+/)
       .filter(degree => _.startsWith(degree, "("))
       .map(degree => _.trim(degree, "()"))
       .value();
@@ -227,13 +229,31 @@ export const qualities = _.chain(parents)
         let updatedFormula = _.join(updatedDegrees, " ");
         let updatedName = _.trim(`${name} ${missingString}`);
         let quality = degreesToQuality(updatedDegrees);
+        let major3 = _.find(degrees, a => a === "3");
+        let minor3 = _.find(degrees, a => a === "b3");
+        let major7 = _.find(degrees, a => a === "7");
+        let minor7 = _.find(degrees, a => a === "b7");
+        let family =
+          major3 && major7
+            ? "major"
+            : major3 && minor7
+            ? "dominant"
+            : minor3
+            ? "minor"
+            : undefined;
+        let alterations = _.filter(
+          degrees,
+          degree => degree.includes("#") || degree.includes("b")
+        );
         let result = {
+          alterations,
           name: updatedName,
           degrees: updatedDegrees,
           formula: updatedFormula,
           parent: degrees,
           missing,
-          quality
+          quality,
+          family
         };
         result.value = JSON.stringify(result);
         return result;
@@ -241,6 +261,9 @@ export const qualities = _.chain(parents)
       .value();
   })
   .reject(({ degrees, parent, missing }) => {
-    return !_.isEmpty(_.difference(missing, parent)) || _.size(degrees) < 3;
+    return _.size(degrees) < 3;
   })
+  .tap(qualities =>
+    console.log(`Generated ${_.size(qualities)} chord qualities. *whew*`)
+  )
   .value();
