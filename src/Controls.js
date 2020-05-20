@@ -1,7 +1,6 @@
 import React from "react";
 import _ from "lodash";
 import getSubstitutions from "./getSubstitutions.js";
-import semitoneDistance from "./semitoneDistance";
 import styled from "styled-components";
 import { Button } from "semantic-ui-react";
 import { Icon } from "semantic-ui-react";
@@ -119,16 +118,17 @@ const Controls = ({
     return false;
   };
 
-  let possibleSubstitutions = getSubstitutions(
-    chord.notes,
-    tuning,
-    chord.root,
-    chord.quality,
-    allowPartialQualities,
-    sharps,
-    previousChord,
-    nextChord
-  );
+  // let possibleSubstitutions = getSubstitutions(
+  //   chord.notes,
+  //   tuning,
+  //   chord.root,
+  //   chord.quality,
+  //   allowPartialQualities,
+  //   sharps,
+  //   previousChord,
+  //   nextChord
+  // );
+  let possibleSubstitutions = [];
 
   const Substitution = ({ substitution }) => {
     let [open, setOpen] = useState(false);
