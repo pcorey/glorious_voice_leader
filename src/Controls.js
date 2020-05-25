@@ -4,6 +4,7 @@ import getSubstitutions from "./getSubstitutions.js";
 import styled from "styled-components";
 import { Button } from "semantic-ui-react";
 import { Icon } from "semantic-ui-react";
+import { Popup } from "semantic-ui-react";
 import { Search } from "semantic-ui-react";
 import { qualities } from "./qualities";
 import { roots } from "./roots";
@@ -118,20 +119,25 @@ const Controls = ({
     return false;
   };
 
-  // let possibleSubstitutions = getSubstitutions(
-  //   chord.notes,
-  //   tuning,
-  //   chord.root,
-  //   chord.quality,
-  //   allowPartialQualities,
-  //   sharps,
-  //   previousChord,
-  //   nextChord
-  // );
-  let possibleSubstitutions = [];
+  let possibleSubstitutions = getSubstitutions(
+    chord.notes,
+    tuning,
+    chord.root,
+    chord.quality,
+    allowPartialQualities,
+    sharps,
+    previousChord,
+    nextChord
+  );
 
   const Substitution = ({ substitution }) => {
     let [open, setOpen] = useState(false);
+    let scoreString =
+      substitution.score === 0
+        ? `±0`
+        : substitution.score >= 0
+        ? `+${Math.abs(substitution.score)}`
+        : `-${Math.abs(substitution.score)}`;
     return (
       <div
         style={{
@@ -150,33 +156,41 @@ const Controls = ({
             {substitution.quality.name}
           </Link>
           <div style={{ flex: "1", textAlign: "right" }}>
-            <Icon
-              name="question"
-              style={{
-                marginRight: "1rem",
-                color: open ? "#666" : "#eee",
-                cursor: "pointer"
-              }}
-              onClick={() => setOpen(!open)}
+            <Popup
+              content="That's the rationale behind this chord substitution?"
+              position="top right"
+              trigger={
+                <Icon
+                  name="question"
+                  style={{
+                    marginRight: "1rem",
+                    color: open ? "#666" : "#eee",
+                    cursor: "pointer"
+                  }}
+                  onClick={() => setOpen(!open)}
+                />
+              }
             />
           </div>
-          <span
-            style={{
-              padding: "0.25rem 0.5rem",
-              margin: "-0.25rem -0.5rem",
-              backgroundColor: `rgba(0,0,255,${Math.atan(
-                substitution.score * 0.25
-              ) /
-                (Math.PI / 2) /
-                2})`
-            }}
-          >
-            {substitution.score === 0
-              ? `±0`
-              : substitution.score >= 0
-              ? `+${Math.abs(substitution.score)}`
-              : `-${Math.abs(substitution.score)}`}
-          </span>
+          <Popup
+            content={`This substitution has a voicing with ${substitution.score} semitones less movement than your current voicing.`}
+            position="top right"
+            trigger={
+              <span
+                style={{
+                  padding: "0.25rem 0.5rem",
+                  margin: "-0.25rem -0.5rem",
+                  backgroundColor: `rgba(0,0,255,${Math.atan(
+                    substitution.score * 0.25
+                  ) /
+                    (Math.PI / 2) /
+                    2})`
+                }}
+              >
+                {scoreString}
+              </span>
+            }
+          />
         </div>
         {open &&
           _.map(substitution.substitutions, substitution => (
@@ -217,30 +231,42 @@ const Controls = ({
             value={searchString}
           />
         </div>
-        <Button
-          icon
-          style={{
-            flex: 0,
-            fontSize: "1rem",
-            backgroundColor: "#f8f8f8",
-            marginRight: "0.5rem"
-          }}
-          onClick={onClickAdd}
-        >
-          <Icon name="add circle" />
-        </Button>
-        <Button
-          icon
-          style={{
-            flex: 0,
-            fontSize: "1rem",
-            backgroundColor: "#f8f8f8",
-            marginRight: "0"
-          }}
-          onClick={onClickRemove}
-        >
-          <Icon name="trash" />
-        </Button>
+        <Popup
+          content="Add a chord after this one in the progression."
+          position="top right"
+          trigger={
+            <Button
+              icon
+              style={{
+                flex: 0,
+                fontSize: "1rem",
+                backgroundColor: "#f8f8f8",
+                marginRight: "0.5rem"
+              }}
+              onClick={onClickAdd}
+            >
+              <Icon name="add circle" />
+            </Button>
+          }
+        />
+        <Popup
+          content="Remove this chord from the progression."
+          position="top right"
+          trigger={
+            <Button
+              icon
+              style={{
+                flex: 0,
+                fontSize: "1rem",
+                backgroundColor: "#f8f8f8",
+                marginRight: "0"
+              }}
+              onClick={onClickRemove}
+            >
+              <Icon name="trash" />
+            </Button>
+          }
+        />
       </Row>
       {!_.isEmpty(chord.previousSubstitutions) && (
         <Row>

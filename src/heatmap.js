@@ -7,17 +7,12 @@ export default (voicings, reducer) => {
         if (!heatmap[[string, fret]]) {
           heatmap[[string, fret]] = 0;
         }
-        // heatmap[[string, fret]] += incrementer({ string, fret, voicing, i });
         heatmap[[string, fret]] = reducer(heatmap[[string, fret]], {
           string,
           fret,
           voicing,
           i
         });
-        // heatmap[[string, fret]] = _.max([
-        //   heatmap[[string, fret]] || 0,
-        //   incrementer({ string, fret, voicing, i })
-        // ]);
       });
       return heatmap;
     }, {})

@@ -106,3 +106,17 @@ blockquote footer {
 blockquote ol {
     margin: 0;
 }
+
+.ui.popup {
+    border-radius: 0;
+    border: none;
+    box-shadow: none;
+    background-color: #666;
+    color: white;
+    font-size:0.7rem;
+}
+
+.ui.popup:before {
+    background: #666 !important;
+    box-shadow: none;
+}

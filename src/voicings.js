@@ -8,7 +8,6 @@ const findNoteOnFretboard = (
   minCapo,
   maxCapo
 ) => note => {
-  console.log(`Generating voicings between frets ${minCapo} and ${maxCapo}.`);
   const is_note = ([string, fret]) => {
     let note_to_test = tuning[string] + fret;
     return note_to_test === note || note_to_test % 12 === note;
@@ -37,7 +36,7 @@ const hasUnplayableStretch = (maxReach, allowOpen, capo) => chord => {
   );
   let [, min] = _.minBy(filteredChord, ([string, fret]) => fret);
   let [, max] = _.maxBy(filteredChord, ([string, fret]) => fret);
-  return max - min > maxReach + 1;
+  return max - min > maxReach;
 };
 
 export default (
@@ -68,6 +67,9 @@ export default (
     .add(maxReach)
     .thru(fret => _.min([fret, max]))
     .value();
+
+  console.log(`Generating voicings between frets ${minCapo} and ${maxCapo}.`);
+
   return _.chain(notes)
     .map(findNoteOnFretboard(frets, strings, tuning, minCapo, maxCapo))
     .thru(notesOnFretboard => _.product.apply(null, notesOnFretboard))

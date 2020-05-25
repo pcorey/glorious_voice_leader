@@ -7,7 +7,6 @@ import getVoicings from "./voicings";
 import semitoneDistance from "./semitoneDistance";
 import styled from "styled-components";
 import { degreeToPitch } from "./qualities";
-import { possibleDegrees } from "./qualities";
 import { roots } from "./roots";
 import { useEffect } from "react";
 import { useRef } from "react";
@@ -188,7 +187,7 @@ const Fretboard = ({
   console.time("Time to generate heatmap");
   let heatmap = _.chain(voicings)
     .thru(voicings =>
-      getHeatmap(voicings, (previous, { i, voicing }) => {
+      getHeatmap(voicings, (previous, { voicing }) => {
         let hasPreviousChord = !_.isEmpty(_.get(previousChord, "notes"));
         if (hasPreviousChord) {
           let distance =

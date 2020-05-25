@@ -7,14 +7,10 @@ import { qualities } from "./qualities";
 import { roots } from "./roots";
 
 const substitutions = [
-  // {
-  //   description: () => (
-  //     <span>This chord shares the exact same notes as your current chord.</span>
-  //   ),
-  //   test: (current, subCurrent, root, { quality, name, degrees }) => {
-  //     return _.isEqual(current, subCurrent);
-  //   }
-  // },
+  // V - I
+  // ii - V - I
+  // tritone sub
+  // ???
   {
     id: "Chord Chemistry 11.I",
     description: () => (
@@ -186,6 +182,105 @@ const substitutions = [
         _.get(nextChord, "quality.family") === "minor"
       );
     }
+  },
+  {
+    id: "Guitar Style Major Chords",
+    description: () => (
+      <span>
+        <blockquote>
+          [For major chords], substitute relative minor or secondary relative
+          minor chords.
+          <footer>
+            —{" "}
+            <a href="https://amzn.to/2YNsYcG">
+              Joe Pass in <em>Guitar Style</em>
+            </a>
+          </footer>
+        </blockquote>
+      </span>
+    ),
+    test: (
+      current,
+      subCurrent,
+      root,
+      { family, name, degrees, alterations },
+      selectedRoot,
+      selectedQuality,
+      nextChord
+    ) => {
+      let relative = roots[root] === (roots[selectedRoot] + 4) % 12;
+      let secondaryRelative = roots[root] === (roots[selectedRoot] + 9) % 12;
+      return (
+        (relative || secondaryRelative) &&
+        selectedQuality.family === "major" &&
+        family === "minor" &&
+        _.isEmpty(alterations)
+      );
+    }
+  },
+  {
+    id: "Guitar Style Minor Chords",
+    description: () => (
+      <span>
+        <blockquote>
+          [For minor chords], substitute relative major chords.
+          <footer>
+            —{" "}
+            <a href="https://amzn.to/2YNsYcG">
+              Joe Pass in <em>Guitar Style</em>
+            </a>
+          </footer>
+        </blockquote>
+      </span>
+    ),
+    test: (
+      current,
+      subCurrent,
+      root,
+      { family, name, degrees, alterations },
+      selectedRoot,
+      selectedQuality,
+      nextChord
+    ) => {
+      return (
+        roots[root] === (roots[selectedRoot] + 3) % 12 &&
+        selectedQuality.family === "minor" &&
+        family === "major" &&
+        _.isEmpty(alterations)
+      );
+    }
+  },
+  {
+    id: "Guitar Style Seventh Chords",
+    description: () => (
+      <span>
+        <blockquote>
+          [For seventh chords], substitute dominant minor chords.
+          <footer>
+            —{" "}
+            <a href="https://amzn.to/2YNsYcG">
+              Joe Pass in <em>Guitar Style</em>
+            </a>
+          </footer>
+        </blockquote>
+      </span>
+    ),
+    test: (
+      current,
+      subCurrent,
+      root,
+      { family, name, degrees, alterations },
+      selectedRoot,
+      selectedQuality,
+      nextChord
+    ) => {
+      return (
+        roots[root] === (roots[selectedRoot] + 7) % 12 &&
+        selectedQuality.family === "dominant" &&
+        family === "minor" &&
+        _.isEmpty(alterations)
+      );
+    }
   }
 ];
 
@@ -289,11 +384,10 @@ export default (
         };
       });
     })
-
     .reject(result => {
       return _.chain(result.quality)
-        .omit("value")
-        .isEqual(_.omit(selectedQuality, "value"))
+        .pick("name")
+        .isEqual(_.pick(selectedQuality, "name"))
         .value();
     })
     .map(sub => {

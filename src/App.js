@@ -11,6 +11,7 @@ import { Button } from "semantic-ui-react";
 import { Dropdown } from "semantic-ui-react";
 import { Form } from "semantic-ui-react";
 import { Icon } from "semantic-ui-react";
+import { Popup } from "semantic-ui-react";
 import { Radio } from "semantic-ui-react";
 import { Slider } from "react-semantic-ui-range";
 import { useEffect } from "react";
@@ -329,18 +330,24 @@ const App = ({
             {urlParams.has("title")
               ? urlParams.get("title")
               : "Glorious Voice Leader"}
-            <Button
-              icon
-              style={{
-                float: "right",
-                backgroundColor: settings ? "#eee" : "#f8f8f8",
-                borderRadius: 0,
-                marginRight: 0
-              }}
-              onClick={() => setSettings(!settings)}
-            >
-              <Icon name="cog" />
-            </Button>
+            <Popup
+              content="Change Glorious Voice Leader settings."
+              position="top right"
+              trigger={
+                <Button
+                  icon
+                  style={{
+                    float: "right",
+                    backgroundColor: settings ? "#eee" : "#f8f8f8",
+                    borderRadius: 0,
+                    marginRight: 0
+                  }}
+                  onClick={() => setSettings(!settings)}
+                >
+                  <Icon name="cog" />
+                </Button>
+              }
+            />
           </Title>
           {settings && (
             <Settings>

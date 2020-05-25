@@ -243,7 +243,9 @@ export const qualities = _.chain(baseQualities)
             : undefined;
         let alterations = _.filter(
           degrees,
-          degree => degree.includes("#") || degree.includes("b")
+          degree =>
+            (degree.includes("#") || degree.includes("b")) &&
+            !_.includes(["b3", "b7"], degree)
         );
         let result = {
           alterations,
