@@ -339,7 +339,7 @@ export default (
   let deltas = _.chain(playedNotesWeCareAbout)
     .thru(({ previous, current }) => _.zip(previous, current))
     .map(([previous, current]) => {
-      let delta = Math.max(5, Math.abs(previous - current) + 1);
+      let delta = Math.min(5, Math.abs(previous - current) + 1);
       return _.range((previous < current ? -1 : 1) * delta);
     })
     .thru(deltas => _.product(...deltas))
