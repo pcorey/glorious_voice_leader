@@ -11,6 +11,10 @@ const tunings = _.chain([
   },
   { text: "DADGAD tuning", value: JSON.stringify([38, 45, 50, 55, 60, 62]) },
   {
+    text: "New standard tuning - CGDAEG",
+    value: JSON.stringify([36, 43, 50, 57, 64, 67])
+  },
+  {
     text: "Ukulele (High G) tuning - GBCD",
     value: JSON.stringify([67, 60, 64, 69])
   },
