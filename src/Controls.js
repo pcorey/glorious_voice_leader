@@ -1,6 +1,5 @@
 import React from "react";
 import _ from "lodash";
-import getSubstitutions from "./getSubstitutions.js";
 import styled from "styled-components";
 import { Button } from "semantic-ui-react";
 import { Icon } from "semantic-ui-react";
@@ -8,7 +7,11 @@ import { Popup } from "semantic-ui-react";
 import { Search } from "semantic-ui-react";
 import { qualities } from "./qualities";
 import { roots } from "./roots";
+import { substitutions } from "./substitutions";
+import { useEffect } from "react";
 import { useState } from "react";
+
+const substitutionMap = _.keyBy(substitutions, "id");
 
 const Wrapper = styled.div`
   display: flex;
@@ -51,16 +54,52 @@ const Controls = ({
   allowPartialQualities,
   previousChord,
   nextChord,
-  // onChangeRoot,
-  // onChangeQuality,
   onClickAdd,
   onClickRemove,
-  onClickChord
+  onClickChord,
+  getSubstitutionsWorker
 }) => {
+  let [possibleSubstitutions, setPossibleSubstitutions] = useState(undefined);
   let [searchString, setSearchString] = useState(
     chord.root && chord.quality ? `${chord.root}${chord.quality.name}` : ""
   );
   let [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const fetch = async () => {
+      setLoading(true);
+      let possibleSubstitutions = _.chain(
+        await getSubstitutionsWorker().workerGetSubstitutions({
+          chord,
+          tuning,
+          allowPartialQualities,
+          sharps,
+          previousChord,
+          nextChord
+        })
+      )
+        .map(substitution => {
+          return {
+            ...substitution,
+            substitutions: _.map(substitution.substitutions, id => {
+              return substitutionMap[id];
+            })
+          };
+        })
+        .value();
+      setPossibleSubstitutions(possibleSubstitutions);
+      setLoading(false);
+    };
+    fetch();
+  }, [
+    chord,
+    tuning,
+    allowPartialQualities,
+    sharps,
+    previousChord,
+    nextChord,
+    getSubstitutionsWorker
+  ]);
 
   const split = string => {
     return _.reject(
@@ -118,17 +157,6 @@ const Controls = ({
     ]);
     return false;
   };
-
-  let possibleSubstitutions = getSubstitutions(
-    chord.notes,
-    tuning,
-    chord.root,
-    chord.quality,
-    allowPartialQualities,
-    sharps,
-    previousChord,
-    nextChord
-  );
 
   const Substitution = ({ substitution }) => {
     let [open, setOpen] = useState(false);
@@ -193,8 +221,10 @@ const Controls = ({
           />
         </div>
         {open &&
-          _.map(substitution.substitutions, substitution => (
-            <div style={{ margin: "1rem" }}>{substitution.description}</div>
+          _.map(substitution.substitutions, (substitution, i) => (
+            <div key={i} style={{ margin: "1rem" }}>
+              {substitution.description}
+            </div>
           ))}
       </div>
     );
@@ -305,14 +335,14 @@ const Controls = ({
       )}
       {!_.isEmpty(possibleSubstitutions) && (
         <Row>
-          <p style={{ margin: "1rem 0 0", width: "100%" }}>
+          <div style={{ margin: "1rem 0 0", width: "100%" }}>
             <strong>Possible substitutions:</strong>{" "}
             {_.chain(possibleSubstitutions)
               .map((alternate, i, list) => {
-                return <Substitution substitution={alternate} />;
+                return <Substitution key={i} substitution={alternate} />;
               })
               .value()}
-          </p>
+          </div>
         </Row>
       )}
     </Wrapper>

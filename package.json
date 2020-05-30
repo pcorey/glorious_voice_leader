@@ -14,11 +14,12 @@
     "prettier": "^1.18.2",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
-    "react-scripts": "3.0.1",
+    "react-scripts": "3.4.1",
     "react-semantic-ui-range": "^0.7.0",
     "semantic-ui-css": "^2.4.1",
     "semantic-ui-react": "^0.87.3",
-    "styled-components": "^5.0.1"
+    "styled-components": "^5.0.1",
+    "workerize-loader": "^1.2.1"
   },
   "scripts": {
     "start": "react-scripts start",

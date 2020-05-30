@@ -3,13 +3,13 @@ import React from "react";
 import _ from "lodash";
 import getHeatmap from "./heatmap";
 import getPixelRatio from "./getPixelRatio";
-import getVoicings from "./voicings";
 import semitoneDistance from "./semitoneDistance";
 import styled from "styled-components";
 import { degreeToPitch } from "./qualities";
 import { roots } from "./roots";
 import { useEffect } from "react";
 import { useRef } from "react";
+import { useState } from "react";
 
 const fretSizeRatio = 1.5;
 const lineWidth = 3;
@@ -31,34 +31,38 @@ const Fretboard = ({
   allowOpen,
   sharps,
   maxReach,
-  capo
+  capo,
+  getVoicingsWorker
 }) => {
   let ref = useRef();
+
+  let [loading, setLoading] = useState(false);
+  let [voicings, setVoicings] = useState(undefined);
+
+  useEffect(() => {
+    const fetch = async () => {
+      setLoading(true);
+      console.time("Time to generate voicings");
+      let voicings = await getVoicingsWorker().workerGetVoicings({
+        chord,
+        tuning,
+        allowOpen,
+        frets,
+        maxReach,
+        capo
+      });
+      console.timeEnd("Time to generate voicings");
+      setVoicings(voicings);
+      setLoading(false);
+    };
+    fetch();
+  }, [capo, chord, tuning, allowOpen, frets, maxReach, getVoicingsWorker]);
 
   let notesInQualities = _.chain(chord.quality)
     .get("quality")
     .uniq()
     .map(note => (note + roots[chord.root]) % 12)
     .value();
-
-  console.time("Time to generate voicings");
-  let voicings = _.chain(chord.quality)
-    .get("quality")
-    .map(base => (base + roots[chord.root]) % 12)
-    .thru(quality =>
-      getVoicings(
-        quality,
-        chord.notes,
-        tuning,
-        allowOpen,
-        frets,
-        maxReach,
-        capo
-      )
-    )
-    .uniqWith(_.isEqual)
-    .value();
-  console.timeEnd("Time to generate voicings");
 
   const note = (string, fret, tuning) => {
     return (tuning[string] + fret) % 12;
@@ -115,6 +119,7 @@ const Fretboard = ({
           /#b|b#/,
           ""
         );
+        return degree;
       })
       .value();
     return notes;
@@ -294,6 +299,20 @@ const Fretboard = ({
       );
     }
     context.stroke();
+
+    if (loading) {
+      context.font = `bold ${fretWidth *
+        (2 /
+          5)}px -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif`;
+      context.fillStyle = `rgba(255,255,255,0.66)`;
+      context.beginPath();
+      context.rect(0, 0, width * ratio, height * ratio);
+      context.fill();
+      context.fillStyle = "#666";
+      context.textAlign = "center";
+      context.fillText("Loading...", (width * ratio) / 2, (height * ratio) / 2);
+      return;
+    }
 
     // Draw heatmap:
     for (let fret = 0; fret < frets; fret++) {

@@ -5,6 +5,8 @@ import ReactDOM from "react-dom";
 import _ from "lodash";
 import pako from "pako";
 import "./index.css";
+import getVoicingsWorker from "workerize-loader!./workers/getVoicings.js"; // eslint-disable-line import/no-webpack-loader-syntax
+import getSubstitutionsWorker from "workerize-loader!./workers/getSubstitutions.js"; // eslint-disable-line import/no-webpack-loader-syntax
 
 const parse = hash => {
   let initial = {
@@ -40,7 +42,14 @@ const parse = hash => {
 
 let hash = window.location.hash.slice(1);
 
-ReactDOM.render(<App hash={parse(hash)} />, document.getElementById("root"));
+ReactDOM.render(
+  <App
+    hash={parse(hash)}
+    getVoicingsWorker={getVoicingsWorker}
+    getSubstitutionsWorker={getSubstitutionsWorker}
+  />,
+  document.getElementById("root")
+);
 
 // If you want your app to work offline and load faster, you can change
 // unregister() to register() below. Note this comes with some pitfalls.

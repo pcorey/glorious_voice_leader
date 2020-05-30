@@ -262,8 +262,12 @@ export const qualities = _.chain(baseQualities)
       })
       .value();
   })
-  .reject(({ degrees, parent, missing }) => {
+  .reject(({ degrees }) => {
     return _.size(degrees) < 3;
+  })
+  .reject(({ degrees }) => {
+    // TODO: Make this dependant on tuning
+    return _.size(degrees) > 6;
   })
   .tap(qualities =>
     console.log(`Generated ${_.size(qualities)} chord qualities. *whew*`)
