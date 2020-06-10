@@ -32,7 +32,7 @@ const Fretboard = ({
   sharps,
   maxReach,
   capo,
-  getVoicingsWorker
+  getVoicings
 }) => {
   let ref = useRef();
 
@@ -42,8 +42,7 @@ const Fretboard = ({
   useEffect(() => {
     const fetch = async () => {
       setLoading(true);
-      console.time("Time to generate voicings");
-      let voicings = await getVoicingsWorker().workerGetVoicings({
+      let voicings = await getVoicings({
         chord,
         tuning,
         allowOpen,
@@ -51,12 +50,11 @@ const Fretboard = ({
         maxReach,
         capo
       });
-      console.timeEnd("Time to generate voicings");
       setVoicings(voicings);
       setLoading(false);
     };
     fetch();
-  }, [capo, chord, tuning, allowOpen, frets, maxReach, getVoicingsWorker]);
+  }, [capo, chord, tuning, allowOpen, frets, maxReach, getVoicings]);
 
   let notesInQualities = _.chain(chord.quality)
     .get("quality")
@@ -189,7 +187,6 @@ const Fretboard = ({
     );
   });
 
-  console.time("Time to generate heatmap");
   let heatmap = _.chain(voicings)
     .thru(voicings =>
       getHeatmap(voicings, (previous, { voicing }) => {
@@ -224,7 +221,6 @@ const Fretboard = ({
         : 0;
     })
     .value();
-  console.timeEnd("Time to generate heatmap");
 
   useEffect(() => {
     let canvas = ref.current;

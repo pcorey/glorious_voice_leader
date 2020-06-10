@@ -57,7 +57,7 @@ const Controls = ({
   onClickAdd,
   onClickRemove,
   onClickChord,
-  getSubstitutionsWorker
+  getSubstitutions
 }) => {
   let [possibleSubstitutions, setPossibleSubstitutions] = useState(undefined);
   let [searchString, setSearchString] = useState(
@@ -68,25 +68,14 @@ const Controls = ({
   useEffect(() => {
     const fetch = async () => {
       setLoading(true);
-      let possibleSubstitutions = _.chain(
-        await getSubstitutionsWorker().workerGetSubstitutions({
-          chord,
-          tuning,
-          allowPartialQualities,
-          sharps,
-          previousChord,
-          nextChord
-        })
-      )
-        .map(substitution => {
-          return {
-            ...substitution,
-            substitutions: _.map(substitution.substitutions, id => {
-              return substitutionMap[id];
-            })
-          };
-        })
-        .value();
+      let possibleSubstitutions = getSubstitutions({
+        chord,
+        tuning,
+        allowPartialQualities,
+        sharps,
+        previousChord,
+        nextChord
+      });
       setPossibleSubstitutions(possibleSubstitutions);
       setLoading(false);
     };
@@ -98,7 +87,7 @@ const Controls = ({
     sharps,
     previousChord,
     nextChord,
-    getSubstitutionsWorker
+    getSubstitutions
   ]);
 
   const split = string => {

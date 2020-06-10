@@ -3,10 +3,14 @@ import App from "./App";
 import React from "react";
 import ReactDOM from "react-dom";
 import _ from "lodash";
-import pako from "pako";
-import "./index.css";
-import getVoicingsWorker from "workerize-loader!./workers/getVoicings.js"; // eslint-disable-line import/no-webpack-loader-syntax
 import getSubstitutionsWorker from "workerize-loader!./workers/getSubstitutions.js"; // eslint-disable-line import/no-webpack-loader-syntax
+import getVoicingsWorker from "workerize-loader!./workers/getVoicings.js"; // eslint-disable-line import/no-webpack-loader-syntax
+import pako from "pako";
+import { substitutions } from "./substitutions";
+
+import "./index.css";
+
+const substitutionMap = _.keyBy(substitutions, "id");
 
 const parse = hash => {
   let initial = {
@@ -42,11 +46,91 @@ const parse = hash => {
 
 let hash = window.location.hash.slice(1);
 
+const voicingsCache = {};
+const getVoicings = async ({
+  chord,
+  tuning,
+  allowOpen,
+  frets,
+  maxReach,
+  capo
+}) => {
+  let key = JSON.stringify({
+    chord,
+    tuning,
+    allowOpen,
+    frets,
+    maxReach,
+    capo
+  });
+  if (voicingsCache[key]) {
+    return voicingsCache[key];
+  }
+  console.time("Time to generate voicings");
+  let voicings = await getVoicingsWorker().workerGetVoicings({
+    chord,
+    tuning,
+    allowOpen,
+    frets,
+    maxReach,
+    capo
+  });
+  voicingsCache[key] = voicings;
+  console.timeEnd("Time to generate voicings");
+  return voicings;
+};
+
+const substitutionsCache = {};
+const getSubstitutions = async ({
+  chord,
+  tuning,
+  allowPartialQualities,
+  sharps,
+  previousChord,
+  nextChord
+}) => {
+  let key = JSON.stringify({
+    chord,
+    tuning,
+    allowPartialQualities,
+    sharps,
+    previousChord,
+    nextChord
+  });
+  if (substitutionsCache[key]) {
+    console.log("cache hit!");
+    return substitutionsCache[key];
+  }
+  console.time("Time to generate substitutions");
+  let possibleSubstitutions = _.chain(
+    await getSubstitutionsWorker().workerGetSubstitutions({
+      chord,
+      tuning,
+      allowPartialQualities,
+      sharps,
+      previousChord,
+      nextChord
+    })
+  )
+    .map(substitution => {
+      return {
+        ...substitution,
+        substitutions: _.map(substitution.substitutions, id => {
+          return substitutionMap[id];
+        })
+      };
+    })
+    .value();
+  substitutionsCache[key] = possibleSubstitutions;
+  console.timeEnd("Time to generate substitutions");
+  return possibleSubstitutions;
+};
+
 ReactDOM.render(
   <App
     hash={parse(hash)}
-    getVoicingsWorker={getVoicingsWorker}
-    getSubstitutionsWorker={getSubstitutionsWorker}
+    getVoicings={getVoicings}
+    getSubstitutions={getSubstitutions}
   />,
   document.getElementById("root")
 );

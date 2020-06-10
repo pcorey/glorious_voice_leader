@@ -75,8 +75,8 @@ const Charts = styled.div`
 const FretSizeContext = React.createContext({ height: 0, width: 0 });
 
 const App = ({
-  getVoicingsWorker,
-  getSubstitutionsWorker,
+  getVoicings,
+  getSubstitutions,
   hash: {
     allowOpen: initialAllowOpen,
     allowPartialQualities: initialAllowPartialQualities,
@@ -482,7 +482,7 @@ const App = ({
                     {selected === i && (
                       <Controls
                         {...{
-                          getSubstitutionsWorker,
+                          getSubstitutions,
                           tuning,
                           chord,
                           sharps,
@@ -540,7 +540,7 @@ const App = ({
           <Fretboard
             key={JSON.stringify({ windowWidth, windowHeight })}
             {...{
-              getVoicingsWorker,
+              getVoicings,
               frets,
               setFretHeight,
               setFretWidth,
