@@ -53,13 +53,15 @@ export default (
     return [];
   }
   let strings = _.size(tuning);
-  let minCapo = _.chain(notesInChord)
-    .maxBy(_.last)
-    .thru(_.last)
-    .defaultTo(0)
-    .subtract(maxReach)
-    .thru(fret => _.max([fret, min]))
-    .value();
+  let minCapo = allowOpen
+    ? 0
+    : _.chain(notesInChord)
+        .maxBy(_.last)
+        .thru(_.last)
+        .defaultTo(0)
+        .subtract(maxReach)
+        .thru(fret => _.max([fret, min]))
+        .value();
   let maxCapo = _.chain(notesInChord)
     .minBy(_.last)
     .thru(_.last)
