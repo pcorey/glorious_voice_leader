@@ -43,7 +43,6 @@ export default (
   previousChord,
   nextChord
 ) => {
-  console.time("Time getting substitutions");
   let currentDistance = previousChord
     ? semitoneDistance(previousChord, tuning)(notes)
     : undefined;
@@ -134,6 +133,5 @@ export default (
     .sortBy("score")
     .reverse()
     .uniqWith(_.isEqual)
-    .tap(() => console.timeEnd("Time getting substitutions"))
     .value();
 };

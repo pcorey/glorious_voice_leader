@@ -6,6 +6,10 @@ import _ from "lodash";
 import getSubstitutionsWorker from "workerize-loader!./workers/getSubstitutions.js"; // eslint-disable-line import/no-webpack-loader-syntax
 import getVoicingsWorker from "workerize-loader!./workers/getVoicings.js"; // eslint-disable-line import/no-webpack-loader-syntax
 import pako from "pako";
+import { get as getCachedSubstitutions } from "./substitutionsCache";
+import { get as getCachedVoicings } from "./voicingsCache";
+import { set as setCachedSubsitutions } from "./substitutionsCache";
+import { set as setCachedVoicings } from "./voicingsCache";
 import { substitutions } from "./substitutions";
 
 import "./index.css";
@@ -46,7 +50,6 @@ const parse = hash => {
 
 let hash = window.location.hash.slice(1);
 
-const voicingsCache = {};
 const getVoicings = async ({
   chord,
   tuning,
@@ -56,31 +59,35 @@ const getVoicings = async ({
   capo
 }) => {
   let key = JSON.stringify({
-    chord,
+    // chord,
+    quality: chord.quality,
+    root: chord.root,
     tuning,
     allowOpen,
     frets,
     maxReach,
     capo
   });
-  if (voicingsCache[key]) {
-    return voicingsCache[key];
+  if (getCachedVoicings(key)) {
+    console.log("Found cached voicings.");
+    return getCachedVoicings(key);
   }
   console.time("Time to generate voicings");
   let voicings = await getVoicingsWorker().workerGetVoicings({
-    chord,
+    // chord,
+    quality: chord.quality,
+    root: chord.root,
     tuning,
     allowOpen,
     frets,
     maxReach,
     capo
   });
-  voicingsCache[key] = voicings;
+  setCachedVoicings(key, voicings);
   console.timeEnd("Time to generate voicings");
   return voicings;
 };
 
-const substitutionsCache = {};
 const getSubstitutions = async ({
   chord,
   tuning,
@@ -97,12 +104,12 @@ const getSubstitutions = async ({
     previousChord,
     nextChord
   });
-  if (substitutionsCache[key]) {
-    console.log("cache hit!");
-    return substitutionsCache[key];
+  if (getCachedSubstitutions(key)) {
+    console.log("Found cached substitutions.");
+    return getCachedSubstitutions(key);
   }
   console.time("Time to generate substitutions");
-  let possibleSubstitutions = _.chain(
+  let substitutions = _.chain(
     await getSubstitutionsWorker().workerGetSubstitutions({
       chord,
       tuning,
@@ -121,9 +128,9 @@ const getSubstitutions = async ({
       };
     })
     .value();
-  substitutionsCache[key] = possibleSubstitutions;
+  setCachedSubsitutions(key, substitutions);
   console.timeEnd("Time to generate substitutions");
-  return possibleSubstitutions;
+  return substitutions;
 };
 
 ReactDOM.render(

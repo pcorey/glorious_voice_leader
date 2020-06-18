@@ -68,7 +68,7 @@ const Controls = ({
   useEffect(() => {
     const fetch = async () => {
       setLoading(true);
-      let possibleSubstitutions = getSubstitutions({
+      let possibleSubstitutions = await getSubstitutions({
         chord,
         tuning,
         allowPartialQualities,

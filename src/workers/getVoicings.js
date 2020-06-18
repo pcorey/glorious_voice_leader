@@ -3,20 +3,22 @@ import getVoicings from "../voicings";
 import { roots } from "../roots";
 
 export const workerGetVoicings = ({
-  chord,
+  // chord,
+  quality,
+  root,
   tuning,
   allowOpen,
   frets,
   maxReach,
   capo
 }) => {
-  let result = _.chain(chord.quality)
+  let result = _.chain(quality)
     .get("quality")
-    .map(base => (base + roots[chord.root]) % 12)
+    .map(base => (base + roots[root]) % 12)
     .thru(quality =>
       getVoicings(
         quality,
-        chord.notes,
+        // chord.notes,
         tuning,
         allowOpen,
         frets,

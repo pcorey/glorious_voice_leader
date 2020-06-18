@@ -41,7 +41,7 @@ const hasUnplayableStretch = (maxReach, allowOpen, capo) => chord => {
 
 export default (
   notes,
-  notesInChord,
+  // notesInChord,
   tuning,
   allowOpen,
   frets = 18,
@@ -53,29 +53,32 @@ export default (
     return [];
   }
   let strings = _.size(tuning);
-  let minCapo = allowOpen
-    ? 0
-    : _.chain(notesInChord)
-        .maxBy(_.last)
-        .thru(_.last)
-        .defaultTo(0)
-        .subtract(maxReach)
-        .thru(fret => _.max([fret, min]))
-        .value();
-  let maxCapo = _.chain(notesInChord)
-    .minBy(_.last)
-    .thru(_.last)
-    .defaultTo(frets)
-    .add(maxReach)
-    .thru(fret => _.min([fret, max]))
-    .value();
+  // let minCapo = allowOpen
+  //   ? 0
+  //   : _.chain(notesInChord)
+  //       .maxBy(_.last)
+  //       .thru(_.last)
+  //       .defaultTo(0)
+  //       .subtract(maxReach)
+  //       .thru(fret => _.max([fret, min]))
+  //       .value();
+  // let maxCapo = _.chain(notesInChord)
+  //   .minBy(_.last)
+  //   .thru(_.last)
+  //   .defaultTo(frets)
+  //   .add(maxReach)
+  //   .thru(fret => _.min([fret, max]))
+  //   .value();
 
-  console.log(`Generating voicings between frets ${minCapo} and ${maxCapo}.`);
+  // console.log(`Generating voicings between frets ${minCapo} and ${maxCapo}.`);
 
-  return _.chain(notes)
-    .map(findNoteOnFretboard(frets, strings, tuning, minCapo, maxCapo))
-    .thru(notesOnFretboard => _.product.apply(null, notesOnFretboard))
-    .reject(hasDoubledStrings)
-    .reject(hasUnplayableStretch(maxReach, allowOpen, min))
-    .value();
+  return (
+    _.chain(notes)
+      // .map(findNoteOnFretboard(frets, strings, tuning, minCapo, maxCapo))
+      .map(findNoteOnFretboard(frets, strings, tuning, min, frets))
+      .thru(notesOnFretboard => _.product.apply(null, notesOnFretboard))
+      .reject(hasDoubledStrings)
+      .reject(hasUnplayableStretch(maxReach, allowOpen, min))
+      .value()
+  );
 };

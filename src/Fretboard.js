@@ -10,6 +10,8 @@ import { roots } from "./roots";
 import { useEffect } from "react";
 import { useRef } from "react";
 import { useState } from "react";
+import { get as voicingsInCache } from "./voicingsCache";
+import { get as substitutionsInCache } from "./substitutionsCache";
 
 const fretSizeRatio = 1.5;
 const lineWidth = 3;
@@ -41,7 +43,21 @@ const Fretboard = ({
 
   useEffect(() => {
     const fetch = async () => {
-      setLoading(true);
+      if (
+        !voicingsInCache(
+          JSON.stringify({
+            quality: chord.quality,
+            root: chord.root,
+            tuning,
+            allowOpen,
+            frets,
+            maxReach,
+            capo
+          })
+        )
+      ) {
+        setLoading(true);
+      }
       let voicings = await getVoicings({
         chord,
         tuning,
@@ -196,7 +212,7 @@ const Fretboard = ({
             semitoneDistance(previousChord, tuning)(voicing) || 0.1;
           return _.max([previous || 0, 1 / distance]);
         } else {
-          return (previous || 0) + 1;
+          return 1;
         }
       })
     )

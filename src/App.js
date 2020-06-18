@@ -173,10 +173,10 @@ const App = ({
     ) {
       chords.splice(selected, 1, {
         ...chords[selected],
-        notes: _.reject(
-          chords[selected].notes,
-          v => JSON.stringify(v) === JSON.stringify([string, fret])
-        )
+        notes: _.chain(chords[selected].notes)
+          .reject(v => JSON.stringify(v) === JSON.stringify([string, fret]))
+          .sortBy(_.identity)
+          .value()
       });
       setChords([...chords]);
     } else if (
@@ -188,10 +188,10 @@ const App = ({
       chords.splice(selected, 1, {
         ...chords[selected],
         notes: [
-          ..._.reject(
-            chords[selected].notes,
-            ([_string, fret]) => _string === string
-          ),
+          ..._.chain(chords[selected].notes)
+            .reject(([_string, fret]) => _string === string)
+            .sortBy(_.identity)
+            .value(),
           [string, fret]
         ]
       });
@@ -199,7 +199,7 @@ const App = ({
     } else {
       chords.splice(selected, 1, {
         ...chords[selected],
-        notes: [...chords[selected].notes, [string, fret]]
+        notes: _.sortBy([...chords[selected].notes, [string, fret]], _.identity)
       });
       setChords([...chords]);
     }
