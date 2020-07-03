@@ -110,7 +110,10 @@ const Fretboard = ({
           _.chain(diff)
             .range()
             .map(_ => {
-              if (diff === Math.abs(roots[target] - root[letter])) {
+              if (
+                diff === Math.abs(roots[target] - roots[letter]) &&
+                roots[target] < roots[letter]
+              ) {
                 return "b";
               } else {
                 return "#";
