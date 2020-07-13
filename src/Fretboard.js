@@ -332,7 +332,9 @@ const Fretboard = ({
     // Draw heatmap:
     for (let fret = 0; fret < frets; fret++) {
       for (let string = 0; string < _.size(tuning); string++) {
-        context.fillStyle = `rgba(0,0,255,${heatmap[[string, fret]] || 0})`;
+        context.fillStyle = `rgba(0,0,255,${
+          heatmap[[string, fret]] ? Math.max(0.1, heatmap[[string, fret]]) : 0
+        })`;
         context.beginPath();
         context.rect(
           fretsLeft + (string - 1) * fretWidth + fretWidth / 2,
