@@ -98,43 +98,89 @@ const Controls = ({
   };
   let inputParts = split(searchString);
 
-  const searchResults = _.chain(qualities)
-    .filter(quality => allowPartialQualities || _.isEmpty(quality.missing))
-    .flatMap(quality =>
-      _.map(Object.keys(roots), root => {
-        return {
-          root,
-          quality
-        };
-      })
-    )
-    .map(({ root, quality }) => {
-      let chordParts = split(`${root}${quality.name}`);
-      return {
-        chordParts,
-        root,
-        quality
-      };
-    })
-    .filter(({ chordParts }) => {
-      if (_.isEmpty(inputParts)) {
-        return false;
-      }
-      return _.chain(inputParts)
-        .intersection(chordParts)
-        .isEqual(inputParts)
+  const searchResults = searchString
+    ? _.chain(qualities)
+        .filter(quality => allowPartialQualities || _.isEmpty(quality.missing))
+        .flatMap(quality =>
+          _.map(Object.keys(roots), root => {
+            return {
+              root,
+              quality
+            };
+          })
+        )
+        .map(({ root, quality }) => {
+          let chordParts = split(`${root}${quality.name}`);
+          return {
+            chordParts,
+            root,
+            quality
+          };
+        })
+        .filter(({ chordParts }) => {
+          if (_.isEmpty(inputParts)) {
+            return false;
+          }
+          return _.chain(inputParts)
+            .intersection(chordParts)
+            .isEqual(inputParts)
+            .value();
+        })
+        .sortBy(({ chordParts }) => {
+          return _.size(chordParts) - _.size(inputParts);
+        })
+        .map(({ root, quality }) => {
+          return {
+            json: JSON.stringify({ root, quality })
+          };
+        })
+        .value()
+    : _.chain(qualities)
+        .filter(quality => allowPartialQualities || _.isEmpty(quality.missing))
+        .flatMap(quality =>
+          _.map(Object.keys(roots), root => {
+            return {
+              root,
+              quality
+            };
+          })
+        )
+        .map(({ root, quality }) => {
+          let chordParts = split(`${root}${quality.name}`);
+          return {
+            chordParts,
+            root,
+            quality
+          };
+        })
+        .filter(({ chordParts, root, quality }) => {
+          if (_.isEmpty(chord.notes)) {
+            return false;
+          }
+          let chordNotes = _.chain(chord.notes)
+            .map(([string, fret]) => (tuning[string] + fret) % 12)
+            .uniq()
+            .sortBy(_.identity)
+            .value();
+          let qualityNotes = _.chain(quality.quality)
+            .map(note => (roots[root] + note) % 12)
+            .sortBy(_.identity)
+            .value();
+          return _.isEqual(chordNotes, qualityNotes);
+          // return _.chain(inputParts)
+          //   .intersection(chordParts)
+          //   .isEqual(inputParts)
+          //   .value();
+        })
+        .sortBy(({ chordParts }) => {
+          return chordParts;
+        })
+        .map(({ root, quality }) => {
+          return {
+            json: JSON.stringify({ root, quality })
+          };
+        })
         .value();
-    })
-    .sortBy(({ chordParts }) => {
-      return _.size(chordParts) - _.size(inputParts);
-    })
-    .map(({ root, quality }) => {
-      return {
-        json: JSON.stringify({ root, quality })
-      };
-    })
-    .value();
-
   const onClickAlternate = alternate => event => {
     onClickChord(alternate, [
       {
@@ -224,13 +270,16 @@ const Controls = ({
       <Row>
         <div style={{ flex: 1, marginRight: "0.5rem" }}>
           <Search
+            open={!searchString ? !_.isEmpty(chord.notes) : undefined}
             loading={loading}
             results={searchResults}
             fluid
             placeholder="Search for a chord"
-            noResultsMessage="I couldn't find any chords like that."
+            noResultsMessage={"I couldn't find any chords like that."}
             noResultsDescription={
-              'Roots should be capitalized, like "Cmaj7". Extensions and alterations can come in any order, like "7#5b9" or "7b9#5". If you still can\'t find what you\'re looking for, just ask for it!'
+              searchString
+                ? 'Roots should be capitalized, like "Cmaj7". Extensions and alterations can come in any order, like "7#5b9" or "7b9#5". If you still can\'t find what you\'re looking for, just ask for it!'
+                : "Try adding more notes to your chord. If you still can't find what you're looking for, just ask for it!"
             }
             style={{
               minWidth: "auto",
