@@ -460,8 +460,8 @@ const App = ({
             </Settings>
           )}
           <Subtitle>
-            Helping you find guitar chord voicings that voice lead smoothly from
-            one chord to the next.
+            Helping you find guitar chord voicings that lead smoothly from one
+            chord to the next.
           </Subtitle>
           <div style={{ margin: "0 0 3rem 0" }}>
             <Charts>
