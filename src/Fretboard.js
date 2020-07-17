@@ -23,6 +23,7 @@ const Canvas = styled.canvas`
 `;
 
 const Fretboard = ({
+  horizontal = false,
   frets,
   setFretHeight,
   setFretWidth,
@@ -181,10 +182,16 @@ const Fretboard = ({
     (height * ratio) / 2
   ];
 
-  const getTopLeft = (cx, cy, fretHeight, fretWidth) => [
-    cy - (fretHeight * frets) / 2,
-    cx - (fretWidth * (_.size(tuning) - 1)) / 2
-  ];
+  const getTopLeft = (cx, cy, fretHeight, fretWidth) =>
+    horizontal
+      ? [
+          cy - (fretWidth * _.size(tuning)) / 2,
+          cx - (fretHeight * frets) / 2 + fretWidth / 2
+        ]
+      : [
+          cy - (fretHeight * frets) / 2,
+          cx - (fretWidth * (_.size(tuning) - 1)) / 2
+        ];
 
   let notesInChord = _.chain(chord)
     .get("notes")
@@ -246,12 +253,19 @@ const Fretboard = ({
     let context = canvas.getContext("2d");
 
     let ratio = getPixelRatio(context);
-    let height = getHeight(canvas);
 
-    let fretHeight = getFretHeight(height, ratio);
+    let fretHeight = getFretHeight(
+      horizontal ? getWidth(canvas) : getHeight(canvas),
+      ratio
+    );
     let fretWidth = getFretWidth(fretHeight);
 
-    let width = (fretWidth / ratio) * _.size(tuning);
+    let height = horizontal
+      ? (fretWidth / ratio) * _.size(tuning)
+      : getHeight(canvas);
+    let width = horizontal
+      ? getWidth(canvas)
+      : (fretWidth / ratio) * _.size(tuning);
 
     let [cx, cy] = getCenter(width, height, ratio);
     let [stringTop, fretsLeft] = getTopLeft(cx, cy, fretHeight, fretWidth);
@@ -273,20 +287,28 @@ const Fretboard = ({
     setFretHeight(fretHeight);
     setFretWidth(fretWidth);
 
+    const rotate = (x, y) => (horizontal ? [y, x] : [x, y]);
+    const invert = string =>
+      horizontal ? _.size(tuning) - string - 1 : string;
+
     // Draw frets:
     for (let fret = 1; fret < frets + 1; fret++) {
       context.beginPath();
-      context.moveTo(fretsLeft, stringTop + fret * fretHeight);
+      context.moveTo(...rotate(fretsLeft, stringTop + fret * fretHeight));
       context.lineTo(
-        fretsLeft + fretWidth * (_.size(tuning) - 1),
-        stringTop + fret * fretHeight
+        ...rotate(
+          fretsLeft + fretWidth * (_.size(tuning) - 1),
+          stringTop + fret * fretHeight
+        )
       );
       context.stroke();
       if (_.includes([3, 5, 7, 9, 12, 15, 18], fret)) {
         context.beginPath();
         context.arc(
-          fretsLeft + 2 * fretWidth + fretWidth / 2,
-          stringTop + fret * fretHeight + fretHeight / 2,
+          ...rotate(
+            fretsLeft + 2 * fretWidth + fretWidth / 2,
+            stringTop + fret * fretHeight + fretHeight / 2
+          ),
           fretWidth / 4 - lineWidth,
           0,
           2 * Math.PI
@@ -295,10 +317,14 @@ const Fretboard = ({
       }
       if (_.includes([0 + 1, 12 + 1], fret)) {
         context.beginPath();
-        context.moveTo(fretsLeft, stringTop + fret * fretHeight + lineWidth);
+        context.moveTo(
+          ...rotate(fretsLeft, stringTop + fret * fretHeight + lineWidth)
+        );
         context.lineTo(
-          fretsLeft + fretWidth * (_.size(tuning) - 1),
-          stringTop + fret * fretHeight + lineWidth
+          ...rotate(
+            fretsLeft + fretWidth * (_.size(tuning) - 1),
+            stringTop + fret * fretHeight + lineWidth
+          )
         );
         context.stroke();
       }
@@ -307,10 +333,14 @@ const Fretboard = ({
     // Draw strings:
     context.beginPath();
     for (let string = 0; string < _.size(tuning); string++) {
-      context.moveTo(fretsLeft + string * fretWidth, stringTop + fretHeight);
+      context.moveTo(
+        ...rotate(fretsLeft + string * fretWidth, stringTop + fretHeight)
+      );
       context.lineTo(
-        fretsLeft + string * fretWidth,
-        stringTop + fretHeight * frets
+        ...rotate(
+          fretsLeft + string * fretWidth,
+          stringTop + fretHeight * frets
+        )
       );
     }
     context.stroke();
@@ -333,14 +363,17 @@ const Fretboard = ({
     for (let fret = 0; fret < frets; fret++) {
       for (let string = 0; string < _.size(tuning); string++) {
         context.fillStyle = `rgba(0,0,255,${
-          heatmap[[string, fret]] ? Math.max(0.1, heatmap[[string, fret]]) : 0
+          heatmap[[invert(string), fret]]
+            ? Math.max(0.1, heatmap[[invert(string), fret]])
+            : 0
         })`;
         context.beginPath();
         context.rect(
-          fretsLeft + (string - 1) * fretWidth + fretWidth / 2,
-          stringTop + fret * fretHeight,
-          fretWidth,
-          fretHeight
+          ...rotate(
+            fretsLeft + (string - 1) * fretWidth + fretWidth / 2,
+            stringTop + fret * fretHeight
+          ),
+          ...rotate(fretWidth, fretHeight)
         );
         context.fill();
       }
@@ -362,12 +395,14 @@ const Fretboard = ({
       .value();
     for (let fret = 0; fret < frets + 1; fret++) {
       for (let string = 0; string < _.size(tuning); string++) {
-        if (noteMap[[string, fret]]) {
+        if (noteMap[[invert(string), fret]]) {
           context.fillStyle = "#666";
           context.beginPath();
           context.arc(
-            fretsLeft + string * fretWidth,
-            stringTop + fret * fretHeight + fretHeight / 2,
+            ...rotate(
+              fretsLeft + string * fretWidth,
+              stringTop + fret * fretHeight + fretHeight / 2
+            ),
             fretWidth / 2 - lineWidth,
             0,
             2 * Math.PI
@@ -375,23 +410,31 @@ const Fretboard = ({
           context.fill();
           context.fillStyle = "#FFF";
           context.fillText(
-            noteName(string, fret, sharps, tuning, chord.quality),
-            fretsLeft + string * fretWidth,
-            stringTop + fret * fretHeight + fretHeight / 2
+            noteName(invert(string), fret, sharps, tuning, chord.quality),
+            ...rotate(
+              fretsLeft + string * fretWidth,
+              stringTop + fret * fretHeight + fretHeight / 2
+            )
           );
-        } else if (_.includes(notesInQualities, (tuning[string] + fret) % 12)) {
-          if (heatmap[[string, fret]]) {
+        } else if (
+          _.includes(notesInQualities, (tuning[invert(string)] + fret) % 12)
+        ) {
+          if (heatmap[[invert(string), fret]]) {
             var [r, g, b] = context.getImageData(
-              fretsLeft + string * fretWidth - lineWidth * 2,
-              stringTop + fret * fretHeight + fretHeight / 2,
+              ...rotate(
+                fretsLeft + string * fretWidth - lineWidth * 2,
+                stringTop + fret * fretHeight + fretHeight / 2
+              ),
               1,
               1
             ).data;
             context.fillStyle = `rgb(${r}, ${g}, ${b})`;
             context.beginPath();
             context.arc(
-              fretsLeft + string * fretWidth,
-              stringTop + fret * fretHeight + fretHeight / 2,
+              ...rotate(
+                fretsLeft + string * fretWidth,
+                stringTop + fret * fretHeight + fretHeight / 2
+              ),
               fretWidth / 4,
               0,
               2 * Math.PI
@@ -402,8 +445,10 @@ const Fretboard = ({
             context.fillStyle = "#FFF";
             context.beginPath();
             context.arc(
-              fretsLeft + string * fretWidth,
-              stringTop + fret * fretHeight + fretHeight / 2,
+              ...rotate(
+                fretsLeft + string * fretWidth,
+                stringTop + fret * fretHeight + fretHeight / 2
+              ),
               fretWidth / 4,
               0,
               2 * Math.PI
@@ -412,9 +457,11 @@ const Fretboard = ({
             context.fillStyle = "#999";
           }
           context.fillText(
-            noteName(string, fret, sharps, tuning, chord.quality),
-            fretsLeft + string * fretWidth,
-            stringTop + fret * fretHeight + fretHeight / 2
+            noteName(invert(string), fret, sharps, tuning, chord.quality),
+            ...rotate(
+              fretsLeft + string * fretWidth,
+              stringTop + fret * fretHeight + fretHeight / 2
+            )
           );
         }
       }
@@ -424,10 +471,8 @@ const Fretboard = ({
     context.fillStyle = "rgba(0,0,0,0.068)";
     context.beginPath();
     context.rect(
-      0,
-      stringTop - lineWidth / 2,
-      width * ratio,
-      stringTop + capo * fretHeight - lineWidth / 2
+      ...rotate(0, stringTop - lineWidth / 2),
+      ...rotate(width * ratio, stringTop + capo * fretHeight - lineWidth / 2)
     );
     context.fill();
   });
@@ -440,17 +485,28 @@ const Fretboard = ({
     let x = e.nativeEvent.offsetX * ratio;
     let y = e.nativeEvent.offsetY * ratio;
 
-    let width = getWidth(canvas);
-    let height = getHeight(canvas);
-
-    let fretHeight = getFretHeight(height, ratio);
+    let fretHeight = getFretHeight(
+      horizontal ? getWidth(canvas) : getHeight(canvas),
+      ratio
+    );
     let fretWidth = getFretWidth(fretHeight);
+
+    let height = horizontal
+      ? (fretWidth / ratio) * _.size(tuning)
+      : getHeight(canvas);
+    let width = horizontal
+      ? getWidth(canvas)
+      : (fretWidth / ratio) * _.size(tuning);
 
     let [cx, cy] = getCenter(width, height, ratio);
     let [stringTop, fretsLeft] = getTopLeft(cx, cy, fretHeight, fretWidth);
 
-    let fret = Math.floor((y - stringTop) / fretHeight);
-    let string = Math.floor((x - fretsLeft - fretWidth / 2) / fretWidth) + 1;
+    let fret = horizontal
+      ? Math.floor(x / fretHeight)
+      : Math.floor((y - stringTop) / fretHeight);
+    let string = horizontal
+      ? _.size(tuning) - Math.floor((y - stringTop) / fretWidth) - 1
+      : Math.floor((x - fretsLeft - fretWidth / 2) / fretWidth) + 1;
 
     if (
       _.isFunction(onClickFret) &&
