@@ -303,6 +303,7 @@ const Fretboard = ({
       );
       context.stroke();
       if (_.includes([3, 5, 7, 9, 12, 15, 18], fret)) {
+        context.fillStyle = "#eee";
         context.beginPath();
         context.arc(
           ...rotate(
