@@ -530,6 +530,7 @@ const App = ({
             <a href="https://amzn.to/2YWgKur">Modern Chord Progressions</a>, or
             Joe Pass' <a href="https://amzn.to/2YNsYcG">Guitar Style</a>.
           </p>
+          <p>This page contains affiliate links.</p>
           <p>
             <em>
               Made by <a href="https://twitter.com/petecorey">@petecorey</a>!
