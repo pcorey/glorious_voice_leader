@@ -213,7 +213,23 @@ const Fretboard = ({
     );
   });
 
-  let heatmap = _.chain(voicings)
+  let heatmapMax = _.chain(
+    getHeatmap(voicings, (previous, { voicing }) => {
+      let hasPreviousChord = !_.isEmpty(_.get(previousChord, "notes"));
+      if (hasPreviousChord) {
+        let distance = semitoneDistance(previousChord, tuning)(voicing) || 0.1;
+        return _.max([previous || 0, 1 / distance]);
+      } else {
+        return 1;
+      }
+    })
+  )
+    .values()
+    .max()
+    .multiply(2)
+    .value();
+
+  let heatmap = _.chain(relevantVoicings)
     .thru(voicings =>
       getHeatmap(voicings, (previous, { voicing }) => {
         let hasPreviousChord = !_.isEmpty(_.get(previousChord, "notes"));
@@ -242,7 +258,7 @@ const Fretboard = ({
             _.chain(relevantVoicings)
               .first()
               .size()
-          ? value
+          ? value / heatmapMax
           : 0
         : 0;
     })

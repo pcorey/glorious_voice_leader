@@ -18,14 +18,16 @@ export default (voicings, reducer) => {
     }, {})
     .value();
 
-  let max =
-    2 *
-    _.chain(heatmap)
-      .values()
-      .max()
-      .value();
+  // let max =
+  //   2 *
+  //   _.chain(heatmap)
+  //     .values()
+  //     .max()
+  //     .value();
 
-  return _.chain(heatmap)
-    .mapValues(heat => heat / max)
-    .value();
+  // return _.chain(heatmap)
+  //   .mapValues(heat => heat / max)
+  //   .value();
+
+  return heatmap;
 };
