@@ -1,3 +1,4 @@
+import "lodash.multicombinations";
 import "lodash.product";
 import _ from "lodash";
 
@@ -47,11 +48,15 @@ export default (
   frets = 18,
   maxReach = 5,
   min = 0,
-  max = frets
+    max = frets,
+    notesInVoicing
 ) => {
   if (_.isEmpty(notes)) {
     return [];
   }
+    if (_.isUndefined(notesInVoicing)) {
+        notesInVoicing = _.size(notes)
+    }
   let strings = _.size(tuning);
   // let minCapo = allowOpen
   //   ? 0
@@ -72,13 +77,20 @@ export default (
 
   // console.log(`Generating voicings between frets ${minCapo} and ${maxCapo}.`);
 
+    let diff = notesInVoicing - _.size(notes);
+
   return (
+      _.chain(notes)
+          .multicombinations(diff)
+          .tap(console.log).flatMap(extraNotes =>
     _.chain(notes)
+                                    .concat(extraNotes)
       // .map(findNoteOnFretboard(frets, strings, tuning, minCapo, maxCapo))
       .map(findNoteOnFretboard(frets, strings, tuning, min, frets))
       .thru(notesOnFretboard => _.product.apply(null, notesOnFretboard))
       .reject(hasDoubledStrings)
       .reject(hasUnplayableStretch(maxReach, allowOpen, min))
       .value()
+                                                    ).value()
   );
 };

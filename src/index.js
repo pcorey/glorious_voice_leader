@@ -1,5 +1,6 @@
 import * as serviceWorker from "./serviceWorker";
 import App from "./App";
+import Harmonizer from "./Harmonizer";
 import React from "react";
 import ReactDOM from "react-dom";
 import _ from "lodash";
@@ -134,6 +135,7 @@ const getSubstitutions = async ({
 };
 
 ReactDOM.render(
+  // <Harmonizer getVoicings={getVoicings} getSubstitutions={getSubstitutions} />,
   <App
     hash={parse(hash)}
     getVoicings={getVoicings}

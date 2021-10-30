@@ -1,9 +1,9 @@
 import "lodash.combinations";
 import _ from "lodash";
-import clipNotes from "./clipNotes";
-import semitoneDistance from "./semitoneDistance";
-import { qualities } from "./qualities";
-import { substitutions } from "./substitutions";
+import clipNotes from "./clipNotes.js";
+import semitoneDistance from "./semitoneDistance.js";
+import { qualities } from "./qualities.js";
+import { substitutions } from "./substitutions.js";
 
 const getQuality = notes => {
   let pitches = _.chain(notes)

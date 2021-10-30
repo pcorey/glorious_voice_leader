@@ -1,12 +1,12 @@
 import "lodash.product";
 import _ from "lodash";
-import clipNotes from "./clipNotes";
+import clipNotes from "./clipNotes.js";
 
 const note = (string, fret, tuning) => {
   return tuning[string] + fret;
 };
 
-export default (previousChord, tuning) => {
+export default (previousChord, tuning, clipper = clipNotes) => {
   if (_.isEmpty(previousChord.notes)) {
     return () => 0;
   }
@@ -26,7 +26,7 @@ export default (previousChord, tuning) => {
       .sort()
       .value();
 
-    let { sum } = clipNotes(previousNotes, notes);
+    let { sum } = clipper(previousNotes, notes);
 
     return sum;
   };

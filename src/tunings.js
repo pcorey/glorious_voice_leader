@@ -6,6 +6,10 @@ const tunings = _.chain([
     value: JSON.stringify([40, 45, 50, 55, 59, 64])
   },
   {
+    text: "Major thirds",
+    value: JSON.stringify([40, 44, 48, 52, 56, 60])
+  },
+  {
     text: "Drop D tuning - DADGBE",
     value: JSON.stringify([38, 45, 50, 55, 59, 64])
   },
