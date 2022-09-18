@@ -10,7 +10,8 @@ export const workerGetVoicings = ({
   allowOpen,
   frets,
   maxReach,
-  capo
+  capo,
+  notes
 }) => {
   let result = _.chain(quality)
     .get("quality")
@@ -23,7 +24,9 @@ export const workerGetVoicings = ({
         allowOpen,
         frets,
         maxReach,
-        capo
+        capo,
+        frets,
+        notes
       )
     )
     .uniqWith(_.isEqual)

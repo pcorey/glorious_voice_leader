@@ -48,15 +48,15 @@ export default (
   frets = 18,
   maxReach = 5,
   min = 0,
-    max = frets,
-    notesInVoicing
+  max = frets,
+  notesInVoicing
 ) => {
   if (_.isEmpty(notes)) {
     return [];
   }
-    if (_.isUndefined(notesInVoicing)) {
-        notesInVoicing = _.size(notes)
-    }
+  if (_.isUndefined(notesInVoicing)) {
+    notesInVoicing = _.size(notes);
+  }
   let strings = _.size(tuning);
   // let minCapo = allowOpen
   //   ? 0
@@ -77,20 +77,19 @@ export default (
 
   // console.log(`Generating voicings between frets ${minCapo} and ${maxCapo}.`);
 
-    let diff = notesInVoicing - _.size(notes);
+  let diff = notesInVoicing - _.size(notes);
 
-  return (
+  return _.chain(notes)
+    .multicombinations(diff)
+    .flatMap(extraNotes =>
       _.chain(notes)
-          .multicombinations(diff)
-          .tap(console.log).flatMap(extraNotes =>
-    _.chain(notes)
-                                    .concat(extraNotes)
-      // .map(findNoteOnFretboard(frets, strings, tuning, minCapo, maxCapo))
-      .map(findNoteOnFretboard(frets, strings, tuning, min, frets))
-      .thru(notesOnFretboard => _.product.apply(null, notesOnFretboard))
-      .reject(hasDoubledStrings)
-      .reject(hasUnplayableStretch(maxReach, allowOpen, min))
-      .value()
-                                                    ).value()
-  );
+        .concat(extraNotes)
+        // .map(findNoteOnFretboard(frets, strings, tuning, minCapo, maxCapo))
+        .map(findNoteOnFretboard(frets, strings, tuning, min, frets))
+        .thru(notesOnFretboard => _.product.apply(null, notesOnFretboard))
+        .reject(hasDoubledStrings)
+        .reject(hasUnplayableStretch(maxReach, allowOpen, min))
+        .value()
+    )
+    .value();
 };

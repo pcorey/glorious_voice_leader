@@ -65,7 +65,11 @@ const Fretboard = ({
         allowOpen,
         frets,
         maxReach,
-        capo
+        capo,
+        notes: Math.max(
+          _.get(chord, "quality.degrees.length", 0),
+          _.get(previousChord, "notes.length", 0)
+        )
       });
       setVoicings(voicings);
       setLoading(false);

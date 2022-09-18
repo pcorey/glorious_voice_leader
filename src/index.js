@@ -57,7 +57,8 @@ const getVoicings = async ({
   allowOpen,
   frets,
   maxReach,
-  capo
+  capo,
+  notes
 }) => {
   let key = JSON.stringify({
     // chord,
@@ -67,7 +68,8 @@ const getVoicings = async ({
     allowOpen,
     frets,
     maxReach,
-    capo
+    capo,
+    notes
   });
   if (getCachedVoicings(key)) {
     console.log("Found cached voicings.");
@@ -82,7 +84,8 @@ const getVoicings = async ({
     allowOpen,
     frets,
     maxReach,
-    capo
+    capo,
+    notes
   });
   setCachedVoicings(key, voicings);
   console.timeEnd("Time to generate voicings");
