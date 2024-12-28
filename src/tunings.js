@@ -19,6 +19,10 @@ const tunings = _.chain([
     value: JSON.stringify([36, 43, 50, 57, 64, 67])
   },
   {
+    text: '"Jacob\'s 5-String" - DAEAD',
+    value: JSON.stringify([38, 45, 52, 57, 62])
+  },
+  {
     text: "Ukulele (High G) tuning - GBCD",
     value: JSON.stringify([67, 60, 64, 69])
   },
