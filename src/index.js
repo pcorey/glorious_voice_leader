@@ -2,7 +2,6 @@ import * as serviceWorker from "./serviceWorker.js";
 import App from "./App.js";
 import Harmonizer from "./Harmonizer.js";
 import React from "react";
-import ReactDOM from "react-dom";
 import _ from "lodash";
 import getSubstitutionsWorker from "workerize-loader!./workers/getSubstitutions.js"; // eslint-disable-line import/no-webpack-loader-syntax
 import getVoicingsWorker from "workerize-loader!./workers/getVoicings.js"; // eslint-disable-line import/no-webpack-loader-syntax
@@ -12,6 +11,7 @@ import { get as getCachedVoicings } from "./voicingsCache.js";
 import { set as setCachedSubsitutions } from "./substitutionsCache.js";
 import { set as setCachedVoicings } from "./voicingsCache.js";
 import { substitutions } from "./substitutions.js";
+import { createRoot } from "react-dom/client";
 
 import "./index.css";
 
@@ -137,14 +137,16 @@ const getSubstitutions = async ({
   return substitutions;
 };
 
-ReactDOM.render(
+const container = document.getElementById("root");
+const root = createRoot(container);
+
+root.render(
   // <Harmonizer getVoicings={getVoicings} getSubstitutions={getSubstitutions} />,
   <App
     hash={parse(hash)}
     getVoicings={getVoicings}
     getSubstitutions={getSubstitutions}
-  />,
-  document.getElementById("root")
+  />
 );
 
 // If you want your app to work offline and load faster, you can change
