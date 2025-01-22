@@ -3,8 +3,8 @@ import App from "./App.js";
 import Harmonizer from "./Harmonizer.js";
 import React from "react";
 import _ from "lodash";
-import * as getSubstitutionsWorker from "workerize-loader!./workers/getSubstitutions.js"; // eslint-disable-line import/no-webpack-loader-syntax
-import * as getVoicingsWorker from "workerize-loader!./workers/getVoicings.js"; // eslint-disable-line import/no-webpack-loader-syntax
+import { workerGetSubstitutions } from "./workers/getSubstitutions.js"; // eslint-disable-line import/no-webpack-loader-syntax
+import { workerGetVoicings } from "./workers/getVoicings.js"; // eslint-disable-line import/no-webpack-loader-syntax
 import pako from "pako";
 import { get as getCachedSubstitutions } from "./substitutionsCache.js";
 import { get as getCachedVoicings } from "./voicingsCache.js";
@@ -76,7 +76,7 @@ const getVoicings = async ({
     return getCachedVoicings(key);
   }
   console.time("Time to generate voicings");
-  let voicings = await getVoicingsWorker().workerGetVoicings({
+  let voicings = await workerGetVoicings({
     // chord,
     quality: chord.quality,
     root: chord.root,
@@ -114,7 +114,7 @@ const getSubstitutions = async ({
   }
   console.time("Time to generate substitutions");
   let substitutions = _.chain(
-    await getSubstitutionsWorker().workerGetSubstitutions({
+    await workerGetSubstitutions({
       chord,
       tuning,
       allowPartialQualities,
