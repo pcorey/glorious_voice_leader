@@ -66,3 +66,11 @@ This section has moved here: https://facebook.github.io/create-react-app/docs/de
 ### `npm run build` fails to minify
 
 This section has moved here: https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify
+
+## Infrastructure
+
+For the initial deploy, run `yarn deploy-gloriousvoiceleader --profile ${AWS_PROFILE}` from the base of the project. This will deploy a CloudFormation stack that creates a Code Pipeline that triggers on a push to `main` in the `glorious_voice_leader` Github repo.
+
+Then, approve the pending Github connection in AWS CodePipeline in the associated AWS account. Also, add www records to Route 53 from Certificate Manager.
+
+To test, push to `main` and validate that the CodePipeline successfully triggers.

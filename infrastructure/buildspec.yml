@@ -1,0 +1,15 @@
+version: 0.2
+phases:
+  build:
+    commands:
+      - npm install -g yarn
+      - yarn
+      - echo Starting build
+      - yarn run build
+      - echo Build finished
+artifacts:
+  name: "BuildOutput"
+  files:
+    - base-directory: build
+    - "**/*"
+    

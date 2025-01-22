@@ -1,0 +1,473 @@
+{
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Description": "gloriousvoiceleader.template",
+  "Resources": {
+    "s3Bucket": {
+      "Type": "AWS::S3::Bucket",
+      "Properties": {
+        "BucketName": {
+          "Fn::Sub": "gloriousvoiceleader-${AWS::AccountId}"
+        },
+        "PublicAccessBlockConfiguration": {
+          "BlockPublicAcls": false,
+          "BlockPublicPolicy": false,
+          "IgnorePublicAcls": false,
+          "RestrictPublicBuckets": false
+        },
+        "WebsiteConfiguration": {
+          "IndexDocument": "index.html"
+        }
+      }
+    },
+    "s3BucketPolicy": {
+      "Type": "AWS::S3::BucketPolicy",
+      "Properties": {
+        "Bucket": {
+          "Ref": "s3Bucket"
+        },
+        "PolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Sid": "PublicReadGetObject",
+              "Effect": "Allow",
+              "Principal": "*",
+              "Action": [
+                "s3:GetObject"
+              ],
+              "Resource": [
+                {
+                  "Fn::Sub": "arn:aws:s3:::${s3Bucket}/*"
+                }
+              ]
+            }
+          ]
+        }
+      }
+    },
+    "hostedZone": {
+      "Type": "AWS::Route53::HostedZone",
+      "Properties": {
+        "Name": "gloriousvoiceleader.com"
+      }
+    },
+    "certificate": {
+      "Type": "AWS::CertificateManager::Certificate",
+      "Properties": {
+        "DomainName": "gloriousvoiceleader.com",
+        "ValidationMethod": "DNS",
+        "DomainValidationOptions": [
+          {
+            "DomainName": "gloriousvoiceleader.com",
+            "HostedZoneId": {
+              "Ref": "hostedZone"
+            }
+          }
+        ],
+        "SubjectAlternativeNames": [
+          "www.gloriousvoiceleader.com"
+        ]
+      }
+    },
+    "cloudfrontDistribution": {
+      "Type": "AWS::CloudFront::Distribution",
+      "Properties": {
+        "DistributionConfig": {
+          "Aliases": [
+            "gloriousvoiceleader.com",
+            "www.gloriousvoiceleader.com"
+          ],
+          "DefaultCacheBehavior": {
+            "CachePolicyId": "4135ea2d-6df8-44a3-9df3-4b5a84be39ad",
+            "TargetOriginId": {
+              "Fn::Sub": "${s3Bucket}.s3-website.${AWS::Region}.amazonaws.com"
+            },
+            "ViewerProtocolPolicy": "redirect-to-https"
+          },
+          "Enabled": true,
+          "Origins": [
+            {
+              "CustomOriginConfig": {
+                "OriginProtocolPolicy": "http-only"
+              },
+              "DomainName": {
+                "Fn::Sub": "${s3Bucket}.s3-website.${AWS::Region}.amazonaws.com"
+              },
+              "Id": {
+                "Fn::Sub": "${s3Bucket}.s3-website.${AWS::Region}.amazonaws.com"
+              }
+            }
+          ],
+          "ViewerCertificate": {
+            "AcmCertificateArn": {
+              "Ref": "certificate"
+            },
+            "MinimumProtocolVersion": "TLSv1.2_2021",
+            "SslSupportMethod": "sni-only"
+          }
+        }
+      }
+    },
+    "recordSet": {
+      "Type": "AWS::Route53::RecordSet",
+      "Properties": {
+        "Name": "gloriousvoiceleader.com",
+        "Type": "A",
+        "AliasTarget": {
+          "DNSName": {
+            "Fn::GetAtt": [
+              "cloudfrontDistribution",
+              "DomainName"
+            ]
+          },
+          "HostedZoneId": "Z2FDTNDATAQYW2"
+        },
+        "HostedZoneId": {
+          "Ref": "hostedZone"
+        }
+      }
+    },
+    "recordSetIpv6": {
+      "Type": "AWS::Route53::RecordSet",
+      "Properties": {
+        "Name": "gloriousvoiceleader.com",
+        "Type": "AAAA",
+        "AliasTarget": {
+          "DNSName": {
+            "Fn::GetAtt": [
+              "cloudfrontDistribution",
+              "DomainName"
+            ]
+          },
+          "HostedZoneId": "Z2FDTNDATAQYW2"
+        },
+        "HostedZoneId": {
+          "Ref": "hostedZone"
+        }
+      }
+    },
+    "recordSetWww": {
+      "Type": "AWS::Route53::RecordSet",
+      "Properties": {
+        "Name": "www.gloriousvoiceleader.com",
+        "Type": "A",
+        "AliasTarget": {
+          "DNSName": {
+            "Fn::GetAtt": [
+              "cloudfrontDistribution",
+              "DomainName"
+            ]
+          },
+          "HostedZoneId": "Z2FDTNDATAQYW2"
+        },
+        "HostedZoneId": {
+          "Ref": "hostedZone"
+        }
+      }
+    },
+    "recordSetWwwIpv6": {
+      "Type": "AWS::Route53::RecordSet",
+      "Properties": {
+        "Name": "www.gloriousvoiceleader.com",
+        "Type": "AAAA",
+        "AliasTarget": {
+          "DNSName": {
+            "Fn::GetAtt": [
+              "cloudfrontDistribution",
+              "DomainName"
+            ]
+          },
+          "HostedZoneId": "Z2FDTNDATAQYW2"
+        },
+        "HostedZoneId": {
+          "Ref": "hostedZone"
+        }
+      }
+    },
+    "githubConnection": {
+      "Type": "AWS::CodeStarConnections::Connection",
+      "Properties": {
+        "ConnectionName": "pcorey",
+        "ProviderType": "GitHub"
+      }
+    },
+    "githubConnectionArn": {
+      "Type": "AWS::SSM::Parameter",
+      "Properties": {
+        "Name": "/gloriousvoiceleader/github-connection-arn",
+        "Type": "String",
+        "Value": {
+          "Fn::GetAtt": [
+            "githubConnection",
+            "ConnectionArn"
+          ]
+        }
+      }
+    },
+    "artifactBucket": {
+      "Type": "AWS::S3::Bucket",
+      "Properties": {
+        "BucketName": {
+          "Fn::Sub": "gloriousvoiceleader-${AWS::AccountId}-artifacts"
+        }
+      }
+    },
+    "artifactBucketPolicy": {
+      "Type": "AWS::S3::BucketPolicy",
+      "Properties": {
+        "Bucket": {
+          "Ref": "artifactBucket"
+        },
+        "PolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Sid": "DenyUnEncryptedObjectUploads",
+              "Effect": "Deny",
+              "Principal": "*",
+              "Action": "s3:PutObject",
+              "Resource": {
+                "Fn::Sub": "${artifactBucket.Arn}/*"
+              },
+              "Condition": {
+                "StringNotEquals": {
+                  "s3:x-amz-server-side-encryption": "aws:kms"
+                }
+              }
+            },
+            {
+              "Sid": "DenyInsecureConnections",
+              "Effect": "Deny",
+              "Principal": "*",
+              "Action": "s3:*",
+              "Resource": {
+                "Fn::Sub": "${artifactBucket.Arn}/*"
+              },
+              "Condition": {
+                "Bool": {
+                  "aws:SecureTransport": false
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    "pipelineRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Effect": "Allow",
+              "Principal": {
+                "Service": [
+                  "codepipeline.amazonaws.com"
+                ]
+              },
+              "Action": "sts:AssumeRole"
+            }
+          ]
+        },
+        "Policies": [
+          {
+            "PolicyName": "AllowRunCodePipeline",
+            "PolicyDocument": {
+              "Version": "2012-10-17",
+              "Statement": [
+                {
+                  "Effect": "Allow",
+                  "Action": [
+                    "codestar-connections:*",
+                    "iam:PassRole",
+                    "logs:*",
+                    "s3:*",
+                    "ssm:*"
+                  ],
+                  "Resource": "*"
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    "codeBuildRole": {
+       "Type": "AWS::IAM::Role",
+       "Properties": {
+          "AssumeRolePolicyDocument": {
+            "Version": "2012-10-17",
+            "Statement": [
+              {
+                "Effect": "Allow",
+                "Principal": {
+                  "Service": [
+                    "codebuild.amazonaws.com"
+                  ]
+                },
+                "Action": "sts:AssumeRole"
+              }
+            ]
+          },
+          "Policies": [
+            {
+              "PolicyName": "AllowRunCodeBuild",
+              "PolicyDocument": {
+                "Version": "2012-10-17",
+                "Statement": [
+                  {
+                    "Effect": "Allow",
+                    "Action": [
+                      "codebuild:*",
+                      "iam:PassRole",
+                      "logs:*",
+                      "s3:*"
+                    ],
+                    "Resource": "*"
+                  }
+                ]
+              }
+            }
+          ]
+       }
+    },
+    "codeBuildProject": {
+      "Type": "AWS::CodeBuild::Project",
+      "Properties": {
+        "Name": "build-gloriousvoiceleader",
+        "ServiceRole": {"Ref": "codeBuildRole"},
+        "Artifacts": {
+          "Type": "CODEPIPELINE"
+        },
+        "Environment": {
+          "ComputeType": "BUILD_GENERAL1_SMALL",
+          "Image": "aws/codebuild/standard:7.0",
+          "Type": "LINUX_CONTAINER"
+        },
+        "Source": {
+          "BuildSpec": "infrastructure/buildspec.yml",
+          "Type": "CODEPIPELINE"
+        }
+      }
+    },
+    "codePipeline": {
+      "Type": "AWS::CodePipeline::Pipeline",
+      "Properties": {
+        "ArtifactStore": {
+          "Type": "S3",
+          "Location": {
+            "Ref": "artifactBucket"
+          }
+        },
+        "Name": "www.gloriousvoiceleader.com",
+        "RoleArn": {
+          "Fn::GetAtt": [
+            "pipelineRole",
+            "Arn"
+          ]
+        },
+        "Stages": [
+          {
+            "Name": "Source",
+            "Actions": [
+              {
+                "Name": "Source",
+                "ActionTypeId": {
+                  "Category": "Source",
+                  "Owner": "AWS",
+                  "Provider": "CodeStarSourceConnection",
+                  "Version": 1
+                },
+                "Configuration": {
+                  "BranchName": "main",
+                  "ConnectionArn": {
+                    "Fn::GetAtt": [
+                      "githubConnectionArn",
+                      "Value"
+                    ]
+                  },
+                  "FullRepositoryId": "pcorey/glorious_voice_leader"
+                },
+                "OutputArtifacts": [
+                  {
+                    "Name": "SourceOutput"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "Name": "Build",
+            "Actions": [
+              {
+                "Name": "Build",
+                "ActionTypeId": {
+                  "Category": "Build",
+                  "Owner": "AWS",
+                  "Provider": "CodeBuild",
+                  "Version": 1
+                },
+                "Configuration": {
+                  "ProjectName": {"Ref": "codeBuildProject"}
+                },
+                "InputArtifacts": [
+                  {
+                    "Name": "SourceOutput"
+                  }
+                ],
+                "OutputArtifacts": [
+                  {
+                    "Name": "BuildOutput"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "Name": "Deploy",
+            "Actions": [
+              {
+                "ActionTypeId": {
+                  "Category": "Deploy",
+                  "Owner": "AWS",
+                  "Provider": "S3",
+                  "Version": "1"
+                },
+                "Configuration": {
+                  "BucketName": {
+                    "Ref": "s3Bucket"
+                  },
+                  "Extract": true
+                },
+                "InputArtifacts": [
+                  {
+                    "Name": "BuildOutput"
+                  }
+                ],
+                "Name": "DeployToS3"
+              }
+            ]
+          }
+        ],
+        "Triggers": [
+          {
+            "GitConfiguration": {
+              "Push": [
+                {
+                  "Branches": {
+                    "Includes": [
+                      "main"
+                    ]
+                  }
+                }
+              ],
+              "SourceActionName": "Source"
+            },
+            "ProviderType": "CodeStarSourceConnection"
+          }
+        ]
+      }
+    }
+  }
+}

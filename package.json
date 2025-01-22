@@ -23,13 +23,17 @@
     "sharp": "^0.28.3",
     "styled-components": "^5.0.1",
     "svg2img": "^0.9.2",
-    "workerize-loader": "^1.2.1"
+    "workerize-loader": "^1.2.1",
+    "@aws-sdk/client-cloudformation": "^3.731.1",
+    "@aws-sdk/credential-providers": "^3.731.1",
+    "@smithy/shared-ini-file-loader": "^4.0.1"
   },
   "scripts": {
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject"
+    "eject": "react-scripts eject",
+    "deploy-gloriousvoiceleader": "yarn && node infrastructure/gloriousvoiceleader.js"
   },
   "eslintConfig": {
     "extends": "react-app"
