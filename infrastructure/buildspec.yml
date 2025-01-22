@@ -10,6 +10,5 @@ phases:
 artifacts:
   name: "BuildOutput"
   files:
-    - base-directory: build
-    - "**/*"
+    - "build/*"
     
