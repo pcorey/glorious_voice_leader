@@ -2,16 +2,16 @@ import "lodash.product";
 
 import React from "react";
 import _ from "lodash";
-import getPixelRatio from "./getPixelRatio";
+import getPixelRatio from "./getPixelRatio.js";
 import styled from "styled-components";
 import { useEffect } from "react";
 import { useRef } from "react";
 
-const getRange = intervals => {
+const getRange = (intervals) => {
   return _.sum(intervals);
 };
 
-const getSmallestPosition = intervals => {
+const getSmallestPosition = (intervals) => {
   let tuning = _.reduce(
     intervals,
     (strings, interval) => [...strings, _.last(strings) + interval],
@@ -19,11 +19,11 @@ const getSmallestPosition = intervals => {
   );
   return _.chain(0)
     .range(12)
-    .find(n =>
+    .find((n) =>
       _.chain(tuning)
-        .map(open => _.range(open, open + n))
+        .map((open) => _.range(open, open + n))
         .flatten()
-        .map(n => n % 12)
+        .map((n) => n % 12)
         .uniq()
         .sortBy(_.identity)
         .isEqual(_.range(0, 12))
@@ -47,13 +47,13 @@ const Canvas = styled.canvas`
   border: 1px solid tomato;
 `;
 
-const getWidth = canvas =>
+const getWidth = (canvas) =>
   window
     .getComputedStyle(canvas)
     .getPropertyValue("width")
     .slice(0, -2);
 
-const getHeight = canvas =>
+const getHeight = (canvas) =>
   window
     .getComputedStyle(canvas)
     .getPropertyValue("height")
@@ -82,11 +82,11 @@ const Everywhere = () => {
     let range = _.range(1, 12);
 
     let stats = _.chain(_.product(range, range, range, range, range))
-      .map(intervals => {
+      .map((intervals) => {
         return {
           intervals,
           range: getRange(intervals),
-          positionSize: getSmallestPosition(intervals)
+          positionSize: getSmallestPosition(intervals),
         };
       })
       .value();

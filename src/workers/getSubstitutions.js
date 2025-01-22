@@ -1,4 +1,4 @@
-import getSubstitutions from "../getSubstitutions";
+import getSubstitutions from "../getSubstitutions.js";
 
 export const workerGetSubstitutions = ({
   chord,
@@ -6,7 +6,7 @@ export const workerGetSubstitutions = ({
   allowPartialQualities,
   sharps,
   previousChord,
-  nextChord
+  nextChord,
 }) => {
   return getSubstitutions(
     chord.notes,

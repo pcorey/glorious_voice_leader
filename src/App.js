@@ -1,12 +1,12 @@
 import "semantic-ui-css/semantic.min.css";
-import Chart from "./Chart";
-import Controls from "./Controls";
-import Fretboard from "./Fretboard";
+import Chart from "./Chart.js";
+import Controls from "./Controls.js";
+import Fretboard from "./Fretboard.js";
 import React from "react";
 import _ from "lodash";
 import pako from "pako";
 import styled from "styled-components";
-import tunings from "./tunings";
+import tunings from "./tunings.js";
 import { Button } from "semantic-ui-react";
 import { Dropdown } from "semantic-ui-react";
 import { Form } from "semantic-ui-react";
@@ -85,8 +85,8 @@ const App = ({
     chords: initialChords,
     frets: initialFrets,
     maxReach: initialMaxReach,
-    capo: initialCapo
-  }
+    capo: initialCapo,
+  },
 }) => {
   let urlParams = new URLSearchParams(window.location.search);
 
@@ -111,7 +111,7 @@ const App = ({
       ...chords[selected],
       key: Math.random(),
       root,
-      notes: preserveNotes ? chords[selected].notes : []
+      notes: preserveNotes ? chords[selected].notes : [],
     });
     setChords([...chords]);
   };
@@ -121,7 +121,7 @@ const App = ({
       ...chords[selected],
       key: Math.random(),
       quality,
-      notes: preserveNotes ? chords[selected].notes : []
+      notes: preserveNotes ? chords[selected].notes : [],
     });
     setChords([...chords]);
   };
@@ -130,7 +130,7 @@ const App = ({
     chords.splice(selected, 1, {
       ...chords[selected],
       key: Math.random(),
-      previousSubstitutions
+      previousSubstitutions,
     });
     onChangeRoot(root);
     onChangeQuality(quality);
@@ -141,7 +141,7 @@ const App = ({
       key: Math.random(),
       quality: undefined,
       notes: [],
-      voicings: []
+      voicings: [],
     });
     setChords([...chords]);
     setSelected(selected + 1);
@@ -158,8 +158,8 @@ const App = ({
           key: Math.random(),
           root: null,
           quality: undefined,
-          notes: []
-        }
+          notes: [],
+        },
       ]);
     }
   };
@@ -167,16 +167,16 @@ const App = ({
   const onClickFret = ({ string, fret }, e) => {
     if (
       _.chain(chords[selected].notes)
-        .map(a => JSON.stringify(a))
+        .map((a) => JSON.stringify(a))
         .includes(JSON.stringify([string, fret]))
         .value()
     ) {
       chords.splice(selected, 1, {
         ...chords[selected],
         notes: _.chain(chords[selected].notes)
-          .reject(v => JSON.stringify(v) === JSON.stringify([string, fret]))
+          .reject((v) => JSON.stringify(v) === JSON.stringify([string, fret]))
           .sortBy(_.identity)
-          .value()
+          .value(),
       });
       setChords([...chords]);
     } else if (
@@ -192,20 +192,23 @@ const App = ({
             .reject(([_string, fret]) => _string === string)
             .sortBy(_.identity)
             .value(),
-          [string, fret]
-        ]
+          [string, fret],
+        ],
       });
       setChords([...chords]);
     } else {
       chords.splice(selected, 1, {
         ...chords[selected],
-        notes: _.sortBy([...chords[selected].notes, [string, fret]], _.identity)
+        notes: _.sortBy(
+          [...chords[selected].notes, [string, fret]],
+          _.identity
+        ),
       });
       setChords([...chords]);
     }
   };
 
-  const onKeyUp = event => {
+  const onKeyUp = (event) => {
     switch (event.key) {
       case "ArrowRight":
         setSelected(Math.min(selected + 1, _.size(chords) - 1));
@@ -222,7 +225,7 @@ const App = ({
         } else {
           chords.splice(selected, 1, {
             ...chords[selected],
-            notes: []
+            notes: [],
           });
           setChords([...chords]);
         }
@@ -238,34 +241,34 @@ const App = ({
         key: Math.random(),
         root: undefined,
         quality: undefined,
-        notes: []
-      }
+        notes: [],
+      },
     ];
     setTuning(JSON.parse(tuning));
     setChords(chords);
   };
 
-  const onChangeSharps = sharps => {
+  const onChangeSharps = (sharps) => {
     setSharps(sharps);
   };
 
-  const onChangeAllowOpen = allowOpen => {
+  const onChangeAllowOpen = (allowOpen) => {
     setAllowOpen(allowOpen);
   };
 
-  const onChangeAllowPartialQualities = allowPartialQualities => {
+  const onChangeAllowPartialQualities = (allowPartialQualities) => {
     setAllowPartialQualities(allowPartialQualities);
   };
 
-  const onChangeFrets = frets => {
+  const onChangeFrets = (frets) => {
     setFrets(frets);
   };
 
-  const onChangeMaxReach = maxReach => {
+  const onChangeMaxReach = (maxReach) => {
     setMaxReach(maxReach);
   };
 
-  const onChangeCapo = capo => {
+  const onChangeCapo = (capo) => {
     setCapo(capo);
   };
 
@@ -304,12 +307,12 @@ const App = ({
       windowWidth,
       sharps,
       frets,
-      chords
+      chords,
     })
       .thru(JSON.stringify)
-      .thru(data => pako.deflate(data, { to: "string" }))
+      .thru((data) => pako.deflate(data, { to: "string" }))
       .thru(btoa)
-      .thru(state => window.history.pushState(null, null, `#${state}`))
+      .thru((state) => window.history.pushState(null, null, `#${state}`))
       .value();
   }, [
     allowOpen,
@@ -321,7 +324,7 @@ const App = ({
     sharps,
     selected,
     frets,
-    chords
+    chords,
   ]);
 
   return (
@@ -342,7 +345,7 @@ const App = ({
                     float: "right",
                     backgroundColor: settings ? "#eee" : "#f8f8f8",
                     borderRadius: 0,
-                    marginRight: 0
+                    marginRight: 0,
                   }}
                   onClick={() => setSettings(!settings)}
                 >
@@ -430,7 +433,7 @@ const App = ({
                   min: 12,
                   max: 24,
                   step: 1,
-                  onChange: onChangeFrets
+                  onChange: onChangeFrets,
                 }}
               />
 
@@ -445,7 +448,7 @@ const App = ({
                   min: 0,
                   max: 8,
                   step: 1,
-                  onChange: onChangeMaxReach
+                  onChange: onChangeMaxReach,
                 }}
               />
 
@@ -476,7 +479,7 @@ const App = ({
                         selected: selected === i,
                         onClick: () => setSelected(i),
                         sharps,
-                        tuning
+                        tuning,
                       }}
                     />
                     {selected === i && (
@@ -497,7 +500,7 @@ const App = ({
                           onChangeQuality,
                           onClickAdd,
                           onClickRemove,
-                          onClickChord
+                          onClickChord,
                         }}
                       />
                     )}
@@ -552,7 +555,7 @@ const App = ({
               capo,
               chord: chords[selected],
               previousChord: selected > 0 ? chords[selected - 1] : undefined,
-              onClickFret
+              onClickFret,
             }}
           ></Fretboard>
         </Right>

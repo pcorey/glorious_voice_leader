@@ -1,17 +1,17 @@
 import "semantic-ui-css/semantic.min.css";
 import React from "react";
 import _ from "lodash";
-import getHeatmap from "./heatmap";
-import getPixelRatio from "./getPixelRatio";
-import semitoneDistance from "./semitoneDistance";
+import getHeatmap from "./heatmap.js";
+import getPixelRatio from "./getPixelRatio.js";
+import semitoneDistance from "./semitoneDistance.js";
 import styled from "styled-components";
-import { degreeToPitch } from "./qualities";
+import { degreeToPitch } from "./qualities.js";
 import { roots } from "./roots";
 import { useEffect } from "react";
 import { useRef } from "react";
 import { useState } from "react";
-import { get as voicingsInCache } from "./voicingsCache";
-import { get as substitutionsInCache } from "./substitutionsCache";
+import { get as voicingsInCache } from "./voicingsCache.js";
+import { get as substitutionsInCache } from "./substitutionsCache.js";
 
 const fretSizeRatio = 1.5;
 const lineWidth = 3;
@@ -35,7 +35,7 @@ const Fretboard = ({
   sharps,
   maxReach,
   capo,
-  getVoicings
+  getVoicings,
 }) => {
   let ref = useRef();
 
@@ -53,7 +53,7 @@ const Fretboard = ({
             allowOpen,
             frets,
             maxReach,
-            capo
+            capo,
           })
         )
       ) {
@@ -69,7 +69,7 @@ const Fretboard = ({
         notes: Math.max(
           _.get(chord, "quality.degrees.length", 0),
           _.get(previousChord, "notes.length", 0)
-        )
+        ),
       });
       setVoicings(voicings);
       setLoading(false);
@@ -80,7 +80,7 @@ const Fretboard = ({
   let notesInQualities = _.chain(chord.quality)
     .get("quality")
     .uniq()
-    .map(note => (note + roots[chord.root]) % 12)
+    .map((note) => (note + roots[chord.root]) % 12)
     .value();
 
   const note = (string, fret, tuning) => {
@@ -95,14 +95,14 @@ const Fretboard = ({
 
     let letterIndex = _.findIndex(
       ["C", "D", "E", "F", "G", "A", "B"],
-      letter => root && letter === root.substr(0, 1)
+      (letter) => root && letter === root.substr(0, 1)
     );
     let letters = _.chain(["C", "D", "E", "F", "G", "A", "B"])
       .drop(letterIndex)
       .concat(_.take(["C", "D", "E", "F", "G", "A", "B"], letterIndex))
       .value();
     let scale = _.chain([0, 2, 4, 5, 7, 9, 11])
-      .map(note => (note + roots[root]) % 12)
+      .map((note) => (note + roots[root]) % 12)
       .map((note, i) => {
         let letter = letters[i];
         let target = notes[note];
@@ -114,7 +114,7 @@ const Fretboard = ({
           letter +
           _.chain(diff)
             .range()
-            .map(_ => {
+            .map((_) => {
               if (
                 diff === Math.abs(roots[target] - roots[letter]) &&
                 roots[target] < roots[letter]
@@ -132,7 +132,7 @@ const Fretboard = ({
 
     _.chain(quality)
       .get("degrees")
-      .map(degree => {
+      .map((degree) => {
         let offset = parseInt(_.replace(degree, /#|b/, "")) - 1;
         let accidental = _.replace(degree, /[^#b]+/, "");
         let letter = scale[offset % _.size(scale)];
@@ -165,13 +165,13 @@ const Fretboard = ({
       : (noteNames[(index - 1 + 12) % 12] + "#").replace(/#b|b#/g, "");
   };
 
-  const getWidth = canvas =>
+  const getWidth = (canvas) =>
     window
       .getComputedStyle(canvas)
       .getPropertyValue("width")
       .slice(0, -2);
 
-  const getHeight = canvas =>
+  const getHeight = (canvas) =>
     window
       .getComputedStyle(canvas)
       .getPropertyValue("height")
@@ -179,22 +179,22 @@ const Fretboard = ({
 
   const getFretHeight = (height, ratio) => (height * ratio - lineWidth) / frets;
 
-  const getFretWidth = fretHeight => fretHeight / fretSizeRatio;
+  const getFretWidth = (fretHeight) => fretHeight / fretSizeRatio;
 
   const getCenter = (width, height, ratio) => [
     (width * ratio) / 2,
-    (height * ratio) / 2
+    (height * ratio) / 2,
   ];
 
   const getTopLeft = (cx, cy, fretHeight, fretWidth) =>
     horizontal
       ? [
           cy - (fretWidth * _.size(tuning)) / 2,
-          cx - (fretHeight * frets) / 2 + fretWidth / 2
+          cx - (fretHeight * frets) / 2 + fretWidth / 2,
         ]
       : [
           cy - (fretHeight * frets) / 2,
-          cx - (fretWidth * (_.size(tuning) - 1)) / 2
+          cx - (fretWidth * (_.size(tuning) - 1)) / 2,
         ];
 
   let notesInChord = _.chain(chord)
@@ -202,16 +202,16 @@ const Fretboard = ({
     .filter(([string, fret]) => {
       return _.chain(chord.quality)
         .get("quality")
-        .map(base => (base + roots[chord.root]) % 12)
+        .map((base) => (base + roots[chord.root]) % 12)
         .includes(note(string, fret, tuning))
         .value();
     })
     .value();
 
-  let relevantVoicings = _.filter(voicings, voicing => {
-    return _.every(notesInChord, note =>
+  let relevantVoicings = _.filter(voicings, (voicing) => {
+    return _.every(notesInChord, (note) =>
       _.chain(voicing)
-        .map(note => note.toString())
+        .map((note) => note.toString())
         .includes(note.toString())
         .value()
     );
@@ -234,7 +234,7 @@ const Fretboard = ({
     .value();
 
   let heatmap = _.chain(relevantVoicings)
-    .thru(voicings =>
+    .thru((voicings) =>
       getHeatmap(voicings, (previous, { voicing }) => {
         let hasPreviousChord = !_.isEmpty(_.get(previousChord, "notes"));
         if (hasPreviousChord) {
@@ -249,9 +249,9 @@ const Fretboard = ({
     .mapValues((value, key) => {
       let [string, fret] = JSON.parse(`[${key}]`);
       let inVoicing = _.chain(relevantVoicings)
-        .some(voicing =>
+        .some((voicing) =>
           _.chain(voicing)
-            .map(voicing => voicing.toString())
+            .map((voicing) => voicing.toString())
             .includes([string, fret].toString())
             .value()
         )
@@ -308,7 +308,7 @@ const Fretboard = ({
     setFretWidth(fretWidth);
 
     const rotate = (x, y) => (horizontal ? [y, x] : [x, y]);
-    const invert = string =>
+    const invert = (string) =>
       horizontal ? _.size(tuning) - string - 1 : string;
 
     // Draw frets:
@@ -498,7 +498,7 @@ const Fretboard = ({
     context.fill();
   });
 
-  const onClick = e => {
+  const onClick = (e) => {
     let canvas = ref.current;
     let context = canvas.getContext("2d");
     let ratio = getPixelRatio(context);

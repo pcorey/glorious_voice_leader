@@ -1,7 +1,7 @@
 import "semantic-ui-css/semantic.min.css";
 import React from "react";
 import _ from "lodash";
-import getPixelRatio from "./getPixelRatio";
+import getPixelRatio from "./getPixelRatio.js";
 import styled from "styled-components";
 import { useEffect } from "react";
 import { useRef } from "react";
@@ -36,7 +36,7 @@ const Chart = ({
   chord,
   selected,
   onClick,
-  sharps
+  sharps,
 }) => {
   let fretboardRatio = 3 / 8;
   let ref = useRef();

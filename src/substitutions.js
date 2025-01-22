@@ -1,6 +1,6 @@
 import React from "react";
 import _ from "lodash";
-import { roots } from "./roots";
+import { roots } from "./roots.js";
 
 export const substitutions = [
   // V - I
@@ -36,7 +36,7 @@ export const substitutions = [
         family === selectedQuality.family &&
         _.isEqual(alterations, selectedQuality.alterations)
       );
-    }
+    },
   },
   //   // Chord Chemistry 11.II
   //   // Needs to insert another chord...
@@ -104,7 +104,7 @@ export const substitutions = [
           .isEmpty()
           .value()
       );
-    }
+    },
   },
   {
     id: "Chord Chemistry 11.IIIb",
@@ -140,7 +140,7 @@ export const substitutions = [
           .isEmpty()
           .value()
       );
-    }
+    },
   },
   {
     id: "Chord Chemistry 11.IIIc",
@@ -177,7 +177,7 @@ export const substitutions = [
           .value() &&
         _.get(nextChord, "quality.family") === "minor"
       );
-    }
+    },
   },
   {
     id: "Guitar Style Major Chords",
@@ -212,7 +212,7 @@ export const substitutions = [
         family === "minor" &&
         _.isEmpty(alterations)
       );
-    }
+    },
   },
   {
     id: "Guitar Style Minor Chords",
@@ -244,7 +244,7 @@ export const substitutions = [
         family === "major" &&
         _.isEmpty(alterations)
       );
-    }
+    },
   },
   {
     id: "Guitar Style Seventh Chords",
@@ -276,6 +276,6 @@ export const substitutions = [
         family === "minor" &&
         _.isEmpty(alterations)
       );
-    }
-  }
+    },
+  },
 ];

@@ -1,6 +1,6 @@
 import _ from "lodash";
-import getVoicings from "../voicings";
-import { roots } from "../roots";
+import getVoicings from "../voicings.js";
+import { roots } from "../roots.js";
 
 export const workerGetVoicings = ({
   // chord,
@@ -11,12 +11,12 @@ export const workerGetVoicings = ({
   frets,
   maxReach,
   capo,
-  notes
+  notes,
 }) => {
   let result = _.chain(quality)
     .get("quality")
-    .map(base => (base + roots[root]) % 12)
-    .thru(quality =>
+    .map((base) => (base + roots[root]) % 12)
+    .thru((quality) =>
       getVoicings(
         quality,
         // chord.notes,

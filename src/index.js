@@ -1,23 +1,23 @@
-import * as serviceWorker from "./serviceWorker";
-import App from "./App";
-import Harmonizer from "./Harmonizer";
+import * as serviceWorker from "./serviceWorker.js";
+import App from "./App.js";
+import Harmonizer from "./Harmonizer.js";
 import React from "react";
 import ReactDOM from "react-dom";
 import _ from "lodash";
 import getSubstitutionsWorker from "workerize-loader!./workers/getSubstitutions.js"; // eslint-disable-line import/no-webpack-loader-syntax
 import getVoicingsWorker from "workerize-loader!./workers/getVoicings.js"; // eslint-disable-line import/no-webpack-loader-syntax
 import pako from "pako";
-import { get as getCachedSubstitutions } from "./substitutionsCache";
-import { get as getCachedVoicings } from "./voicingsCache";
-import { set as setCachedSubsitutions } from "./substitutionsCache";
-import { set as setCachedVoicings } from "./voicingsCache";
-import { substitutions } from "./substitutions";
+import { get as getCachedSubstitutions } from "./substitutionsCache.js";
+import { get as getCachedVoicings } from "./voicingsCache.js";
+import { set as setCachedSubsitutions } from "./substitutionsCache.js";
+import { set as setCachedVoicings } from "./voicingsCache.js";
+import { substitutions } from "./substitutions.js";
 
 import "./index.css";
 
 const substitutionMap = _.keyBy(substitutions, "id");
 
-const parse = hash => {
+const parse = (hash) => {
   let initial = {
     sharps: false,
     allowPartialQualities: true,
@@ -31,9 +31,9 @@ const parse = hash => {
         key: Math.random(),
         root: undefined,
         qualities: [],
-        notes: []
-      }
-    ]
+        notes: [],
+      },
+    ],
   };
   try {
     let parsed = !_.isEmpty(hash)
@@ -58,7 +58,7 @@ const getVoicings = async ({
   frets,
   maxReach,
   capo,
-  notes
+  notes,
 }) => {
   let key = JSON.stringify({
     // chord,
@@ -69,7 +69,7 @@ const getVoicings = async ({
     frets,
     maxReach,
     capo,
-    notes
+    notes,
   });
   if (getCachedVoicings(key)) {
     console.log("Found cached voicings.");
@@ -85,7 +85,7 @@ const getVoicings = async ({
     frets,
     maxReach,
     capo,
-    notes
+    notes,
   });
   setCachedVoicings(key, voicings);
   console.timeEnd("Time to generate voicings");
@@ -98,7 +98,7 @@ const getSubstitutions = async ({
   allowPartialQualities,
   sharps,
   previousChord,
-  nextChord
+  nextChord,
 }) => {
   let key = JSON.stringify({
     chord,
@@ -106,7 +106,7 @@ const getSubstitutions = async ({
     allowPartialQualities,
     sharps,
     previousChord,
-    nextChord
+    nextChord,
   });
   if (getCachedSubstitutions(key)) {
     console.log("Found cached substitutions.");
@@ -120,15 +120,15 @@ const getSubstitutions = async ({
       allowPartialQualities,
       sharps,
       previousChord,
-      nextChord
+      nextChord,
     })
   )
-    .map(substitution => {
+    .map((substitution) => {
       return {
         ...substitution,
-        substitutions: _.map(substitution.substitutions, id => {
+        substitutions: _.map(substitution.substitutions, (id) => {
           return substitutionMap[id];
-        })
+        }),
       };
     })
     .value();

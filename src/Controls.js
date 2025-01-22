@@ -5,9 +5,9 @@ import { Button } from "semantic-ui-react";
 import { Icon } from "semantic-ui-react";
 import { Popup } from "semantic-ui-react";
 import { Search } from "semantic-ui-react";
-import { qualities } from "./qualities";
-import { roots } from "./roots";
-import { substitutions } from "./substitutions";
+import { qualities } from "./qualities.js";
+import { roots } from "./roots.js";
+import { substitutions } from "./substitutions.js";
 import { useEffect } from "react";
 import { useState } from "react";
 
@@ -57,7 +57,7 @@ const Controls = ({
   onClickAdd,
   onClickRemove,
   onClickChord,
-  getSubstitutions
+  getSubstitutions,
 }) => {
   let [possibleSubstitutions, setPossibleSubstitutions] = useState(undefined);
   let [searchString, setSearchString] = useState(
@@ -74,7 +74,7 @@ const Controls = ({
         allowPartialQualities,
         sharps,
         previousChord,
-        nextChord
+        nextChord,
       });
       setPossibleSubstitutions(possibleSubstitutions);
       setLoading(false);
@@ -87,10 +87,10 @@ const Controls = ({
     sharps,
     previousChord,
     nextChord,
-    getSubstitutions
+    getSubstitutions,
   ]);
 
-  const split = string => {
+  const split = (string) => {
     return _.reject(
       string.match(/^[A-Z]b?#?|sus|maj|mM|m|alt|dim|b\d|#\d|\/|\d+|/g),
       _.isEmpty
@@ -100,12 +100,14 @@ const Controls = ({
 
   const searchResults = searchString
     ? _.chain(qualities)
-        .filter(quality => allowPartialQualities || _.isEmpty(quality.missing))
-        .flatMap(quality =>
-          _.map(Object.keys(roots), root => {
+        .filter(
+          (quality) => allowPartialQualities || _.isEmpty(quality.missing)
+        )
+        .flatMap((quality) =>
+          _.map(Object.keys(roots), (root) => {
             return {
               root,
-              quality
+              quality,
             };
           })
         )
@@ -114,7 +116,7 @@ const Controls = ({
           return {
             chordParts,
             root,
-            quality
+            quality,
           };
         })
         .filter(({ chordParts }) => {
@@ -131,17 +133,19 @@ const Controls = ({
         })
         .map(({ root, quality }) => {
           return {
-            json: JSON.stringify({ root, quality })
+            json: JSON.stringify({ root, quality }),
           };
         })
         .value()
     : _.chain(qualities)
-        .filter(quality => allowPartialQualities || _.isEmpty(quality.missing))
-        .flatMap(quality =>
-          _.map(Object.keys(roots), root => {
+        .filter(
+          (quality) => allowPartialQualities || _.isEmpty(quality.missing)
+        )
+        .flatMap((quality) =>
+          _.map(Object.keys(roots), (root) => {
             return {
               root,
-              quality
+              quality,
             };
           })
         )
@@ -150,7 +154,7 @@ const Controls = ({
           return {
             chordParts,
             root,
-            quality
+            quality,
           };
         })
         .filter(({ chordParts, root, quality }) => {
@@ -163,7 +167,7 @@ const Controls = ({
             .sortBy(_.identity)
             .value();
           let qualityNotes = _.chain(quality.quality)
-            .map(note => (roots[root] + note) % 12)
+            .map((note) => (roots[root] + note) % 12)
             .sortBy(_.identity)
             .value();
           return _.isEqual(chordNotes, qualityNotes);
@@ -177,18 +181,18 @@ const Controls = ({
         })
         .map(({ root, quality }) => {
           return {
-            json: JSON.stringify({ root, quality })
+            json: JSON.stringify({ root, quality }),
           };
         })
         .value();
-  const onClickAlternate = alternate => event => {
+  const onClickAlternate = (alternate) => (event) => {
     onClickChord(alternate, [
       {
         root: chord.root,
         quality: chord.quality,
-        name: chord.quality.name
+        name: chord.quality.name,
       },
-      ...chord.previousSubstitutions
+      ...chord.previousSubstitutions,
     ]);
     return false;
   };
@@ -206,11 +210,11 @@ const Controls = ({
         style={{
           backgroundColor: "#fff",
           margin: "1rem 0 0 0",
-          padding: "1rem"
+          padding: "1rem",
         }}
         key={JSON.stringify({
           root: substitution.root,
-          quality: substitution.quality
+          quality: substitution.quality,
         })}
       >
         <div style={{ display: "flex" }}>
@@ -228,7 +232,7 @@ const Controls = ({
                   style={{
                     marginRight: "1rem",
                     color: open ? "#666" : "#eee",
-                    cursor: "pointer"
+                    cursor: "pointer",
                   }}
                   onClick={() => setOpen(!open)}
                 />
@@ -247,7 +251,7 @@ const Controls = ({
                     substitution.score * 0.25
                   ) /
                     (Math.PI / 2) /
-                    2})`
+                    2})`,
                 }}
               >
                 {scoreString}
@@ -285,7 +289,7 @@ const Controls = ({
               minWidth: "auto",
               minHeight: "auto",
               width: "100%",
-              margin: 0
+              margin: 0,
             }}
             resultRenderer={resultRenderer}
             onSearchChange={(event, { value }) => {
@@ -309,7 +313,7 @@ const Controls = ({
                 flex: 0,
                 fontSize: "1rem",
                 backgroundColor: "#f8f8f8",
-                marginRight: "0.5rem"
+                marginRight: "0.5rem",
               }}
               onClick={onClickAdd}
             >
@@ -327,7 +331,7 @@ const Controls = ({
                 flex: 0,
                 fontSize: "1rem",
                 backgroundColor: "#f8f8f8",
-                marginRight: "0"
+                marginRight: "0",
               }}
               onClick={onClickRemove}
             >
