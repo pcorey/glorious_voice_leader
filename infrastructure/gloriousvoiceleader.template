@@ -279,6 +279,7 @@
                 {
                   "Effect": "Allow",
                   "Action": [
+                    "codebuild:*",
                     "codestar-connections:*",
                     "iam:PassRole",
                     "logs:*",
