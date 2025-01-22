@@ -3,8 +3,8 @@ import "lodash.product";
 import React from "react";
 import _ from "lodash";
 import styled from "styled-components";
-import { roots } from "./roots";
-import { qualities } from "./qualities";
+import { roots } from "./roots.js";
+import { qualities } from "./qualities.js";
 import { Checkbox } from "semantic-ui-react";
 import { Dropdown } from "semantic-ui-react";
 import { Slider } from "react-semantic-ui-range";
@@ -88,15 +88,15 @@ const Name = styled.span`
   }
 `;
 
-const getChordNames = notes =>
+const getChordNames = (notes) =>
   _.chain(qualities)
     // .filter(quality => _.isEmpty(quality.missing))
-    .filter(quality => _.size(quality.quality) === 4)
-    .flatMap(quality =>
-      _.map(Object.keys(roots), root => {
+    .filter((quality) => _.size(quality.quality) === 4)
+    .flatMap((quality) =>
+      _.map(Object.keys(roots), (root) => {
         return {
           root,
-          quality
+          quality,
         };
       })
     )
@@ -109,7 +109,7 @@ const getChordNames = notes =>
         .sortBy(_.identity)
         .value();
       let qualityNotes = _.chain(quality.quality)
-        .map(note => (roots[root] + note) % 12)
+        .map((note) => (roots[root] + note) % 12)
         .sortBy(_.identity)
         .value();
       return _.isEqual(chordNotes, qualityNotes);
@@ -126,13 +126,13 @@ const Harmonizer = ({ getVoicings, getSubstitutions }) => {
   // let scale = [0, 3, 6, 9];
   // let scale = [0, 2, 3, 5, 6];
 
-  let noteSets = _.flatMap(_.range(3, 6 + 1), length =>
+  let noteSets = _.flatMap(_.range(3, 6 + 1), (length) =>
     _.combinations(scale, length)
   );
 
   let chordNames = _.chain(noteSets)
     .tap(console.log)
-    .map(noteSet => getChordNames(noteSet))
+    .map((noteSet) => getChordNames(noteSet))
     .flatten()
     .value();
 
@@ -155,20 +155,20 @@ const Harmonizer = ({ getVoicings, getSubstitutions }) => {
               selection
               options={_.chain(_.toPairs(roots))
                 .groupBy(_.last)
-                .map(roots => {
+                .map((roots) => {
                   return [
                     _.chain(roots)
                       .map(_.first)
                       .join("/")
                       .value(),
-                    _.last(roots[0])
+                    _.last(roots[0]),
                   ];
                 })
                 .map(([root, value]) => {
                   return {
                     key: root,
                     text: root,
-                    value
+                    value,
                   };
                 })
                 .value()}
@@ -188,7 +188,7 @@ const Harmonizer = ({ getVoicings, getSubstitutions }) => {
                 [7, "7th"],
                 [9, "9th"],
                 [11, "11th"],
-                [13, "13th"]
+                [13, "13th"],
               ])
                 .map(([note, label]) => {
                   return <Checkbox label={label} />;
@@ -209,7 +209,7 @@ const Harmonizer = ({ getVoicings, getSubstitutions }) => {
               settings={{
                 min: 3,
                 max: 7,
-                step: 1
+                step: 1,
                 // onChange: onChangeFrets
               }}
             />
@@ -217,21 +217,21 @@ const Harmonizer = ({ getVoicings, getSubstitutions }) => {
         </tr>
       </Table>
       {_.chain(range)
-        .map(note =>
+        .map((note) =>
           _.chain(_.toPairs(roots))
             .filter(([name, root]) => note === root)
-            .map(root => _.first(root))
+            .map((root) => _.first(root))
             .join("/")
             .value()
         )
         // .map(root => _.first(root))
-        .map(root => (
+        .map((root) => (
           <Row>
             <Root>{root}</Root>
             <Names>
               {_.chain(chordNames)
                 .filter(
-                  chord =>
+                  (chord) =>
                     chord.root ===
                     _.chain(root)
                       .split("/")
