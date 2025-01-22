@@ -1,6 +1,6 @@
 import getSubstitutions from "../getSubstitutions.js";
 
-const workerGetSubstitutions = ({
+export const workerGetSubstitutions = ({
   chord,
   tuning,
   allowPartialQualities,
@@ -19,5 +19,3 @@ const workerGetSubstitutions = ({
     nextChord
   );
 };
-
-export default workerGetSubstitutions;

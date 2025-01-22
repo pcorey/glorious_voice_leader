@@ -3,8 +3,8 @@ import App from "./App.js";
 import Harmonizer from "./Harmonizer.js";
 import React from "react";
 import _ from "lodash";
-import getSubstitutionsWorker from "workerize-loader!./workers/getSubstitutions.js"; // eslint-disable-line import/no-webpack-loader-syntax
-import getVoicingsWorker from "workerize-loader!./workers/getVoicings.js"; // eslint-disable-line import/no-webpack-loader-syntax
+import * as getSubstitutionsWorker from "workerize-loader!./workers/getSubstitutions.js"; // eslint-disable-line import/no-webpack-loader-syntax
+import * as getVoicingsWorker from "workerize-loader!./workers/getVoicings.js"; // eslint-disable-line import/no-webpack-loader-syntax
 import pako from "pako";
 import { get as getCachedSubstitutions } from "./substitutionsCache.js";
 import { get as getCachedVoicings } from "./voicingsCache.js";
