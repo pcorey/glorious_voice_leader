@@ -6,7 +6,7 @@ import getPixelRatio from "./getPixelRatio.js";
 import semitoneDistance from "./semitoneDistance.js";
 import styled from "styled-components";
 import { degreeToPitch } from "./qualities.js";
-import { roots } from "./roots";
+import { roots } from "./roots.js";
 import { useEffect } from "react";
 import { useRef } from "react";
 import { useState } from "react";
