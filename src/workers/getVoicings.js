@@ -2,7 +2,7 @@ import _ from "lodash";
 import getVoicings from "../voicings.js";
 import { roots } from "../roots.js";
 
-export default workerGetVoicings = ({
+const workerGetVoicings = ({
   // chord,
   quality,
   root,
@@ -33,3 +33,5 @@ export default workerGetVoicings = ({
     .value();
   return result;
 };
+
+export default workerGetVoicings;
