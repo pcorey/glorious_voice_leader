@@ -67,12 +67,16 @@ This section has moved here: https://facebook.github.io/create-react-app/docs/de
 
 This section has moved here: https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify
 
-## Infrastructure
+## Initial Deploy
 
-For the initial deploy, run `yarn deploy-gloriousvoiceleader --profile ${AWS_PROFILE} --action create` from the base of the project. This will deploy a CloudFormation stack that creates a Code Pipeline that triggers on a push to `main` in the `glorious_voice_leader` Github repo.
+Install the East5th tool found [here](https://github.com/East5th/scripts).
 
-Then, approve the pending Github connection in AWS CodePipeline in the associated AWS account. Also, add www records to Route 53 from Certificate Manager.
+Run `east5th aws login` and log in to the `gloriousvoiceleader` AWS account.
+
+Run `east5th aws create-stack` and select the `gloriousvoiceleader` AWS account, set the stack name to `gloriousvoiceleader` and select the `gloriousvoiceleader.template` file for the template. This will deploy a CloudFormation stack that creates a Code Pipeline that triggers on a push to `main` in the `www.gloriousvoiceleader.com` Github repo.
+
+Then, approve the pending Github connection in AWS CodePipeline and add www records to Route 53 from Certificate Manager.
 
 To test, push to `main` and validate that the CodePipeline successfully triggers.
 
-If template changes are needed, update the template file and run `yarn deploy-gloriousvoiceleader --profile ${AWS_PROFILE} --action update`.
+If template changes are needed, update the template file and run `east5th aws update-stack`. Select the `gloriousvoiceleader` AWS account, the `gloriousvoiceleader` stack and select the `gloriousvoiceleader.template` file for the template.
