@@ -3,10 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "@aws-sdk/client-cloudformation": "^3.731.1",
-    "@aws-sdk/credential-providers": "^3.731.1",
     "@react-hook/window-size": "^1.0.13",
-    "@smithy/shared-ini-file-loader": "^4.0.1",
     "@thi.ng/geom-clip": "^0.1.2",
     "@thi.ng/geom-hull": "^0.0.22",
     "@thi.ng/geom-poly-utils": "^0.1.20",
@@ -31,8 +28,7 @@
     "start": "react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
-    "eject": "react-scripts eject",
-    "deploy-gloriousvoiceleader": "yarn && node infrastructure/gloriousvoiceleader.js"
+    "eject": "react-scripts eject"
   },
   "eslintConfig": {
     "extends": "react-app"
